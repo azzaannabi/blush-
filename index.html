@@ -67,6 +67,7 @@ h1,h2,h3{font-family:var(--serif);margin:0;line-height:1.08}
 .hero h1{position:relative;z-index:2;font-weight:800;font-size:clamp(30px,6vw,64px);letter-spacing:-.035em;max-width:14em;margin:10px auto 0}
 .hero .sub{position:relative;z-index:2;max-width:30em;margin:10px auto 0;font-size:clamp(14px,2.3vw,17px);opacity:.85}
 
+.cta{position:relative;z-index:6;margin-top:18px;padding:15px 34px;font-size:17px;box-shadow:0 8px 22px color-mix(in srgb,var(--fg) 28%,transparent)}
 .stage{
   position:relative;z-index:3;height:min(580px,125vw);margin:0 -20px;
   touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;direction:ltr;
@@ -189,6 +190,7 @@ footer b{font:800 26px var(--serif);color:var(--page-fg);letter-spacing:-.04em}
 
   <h1 data-i18n="hero_title"></h1>
   <p class="sub" data-i18n="hero_sub"></p>
+  <button class="btn cta" id="orderNow" type="button" data-i18n="order_now"></button>
 
   <div class="stage" id="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Blush"></div>
 
@@ -219,7 +221,7 @@ footer b{font:800 26px var(--serif);color:var(--page-fg);letter-spacing:-.04em}
     <p class="lead" data-i18n="lead"></p>
     <p class="minnote" id="minNote"></p>
 
-    <h3 class="step" data-i18n="step_products"></h3>
+    <h3 class="step" id="stepProducts" data-i18n="step_products"></h3>
     <div class="qrows" id="qrows"></div>
     <p class="err" id="qerr" role="alert"></p>
 
@@ -277,7 +279,7 @@ const N = P.length;
 
 /* ===== Traductions ===== */
 const I18N = {
-  en:{nav_order:'Order',
+  en:{nav_order:'Order', order_now:'Order now',
     hero_title:'Your dose of creatine and electrolytes, all in 1.',
     hero_sub:'For your muscles, your mind and your skin. Your body will thank you.',
     soldout:'Out of stock', soon:'Coming soon',
@@ -302,7 +304,7 @@ const I18N = {
     done_title:'Your order',done_lead:'Check your details, then send your order.',
     preview:'Preview: orders are not sent yet.',sending:'Sending…',sent_lead:'Thank you! Your order is received, we will call you to confirm it.',e_send:'Your order could not be sent. Check your connection and try again.',wa:'Send on WhatsApp',edit:'Edit my order',
     foot:'Creatine + electrolytes.',order_cta:'Order'},
-  fr:{nav_order:'Commander',
+  fr:{nav_order:'Commander', order_now:'Commander maintenant',
     hero_title:'Votre dose de créatine et d’électrolytes, le tout en 1.',
     hero_sub:'Pour vos muscles, votre mental et votre peau. Votre corps vous remerciera.',
     soldout:'Rupture de stock', soon:'Bientôt disponible',
@@ -327,7 +329,7 @@ const I18N = {
     done_title:'Ta commande',done_lead:'Vérifie tes informations, puis envoie ta commande.',
     preview:'Aperçu : les commandes ne sont pas encore envoyées.',sending:'Envoi…',sent_lead:'Merci ! Ta commande est bien reçue, on t’appelle pour la confirmer.',e_send:'Ta commande n’a pas pu être envoyée. Vérifie ta connexion et réessaie.',wa:'Envoyer sur WhatsApp',edit:'Modifier ma commande',
     foot:'Créatine + électrolytes.',order_cta:'Commander'},
-  ar:{nav_order:'اطلب',
+  ar:{nav_order:'اطلب', order_now:'اطلب الآن',
     hero_title:'جرعتك من الكرياتين والإلكتروليت، كلّها في علبة واحدة.',
     hero_sub:'لعضلاتك وذهنك وبشرتك. جسمك سيشكرك.',
     soldout:'نفدت الكمية', soon:'قريبًا',
@@ -628,6 +630,14 @@ function goOrder(){
   setTimeout(()=>{ if(Math.abs(el.getBoundingClientRect().top-16)>24) window.scrollTo({top:y(),behavior:'auto'}); },900);
 }
 $('#orderBtn').addEventListener('click',e=>{ e.preventDefault(); goOrder(); });
+/* Bouton « Order now » : va directement à « Choisis tes produits » */
+function goProducts(){
+  const el=$('#stepProducts');
+  const y=()=>el.getBoundingClientRect().top+window.pageYOffset-16;
+  window.scrollTo({top:y(),behavior:reduced?'auto':'smooth'});
+  setTimeout(()=>{ if(Math.abs(el.getBoundingClientRect().top-16)>24) window.scrollTo({top:y(),behavior:'auto'}); },900);
+}
+$('#orderNow').addEventListener('click',goProducts);
 
 /* ===== Commande ===== */
 const qty = {}; P.forEach(p=>{ qty[p.id]=0; });
@@ -746,7 +756,7 @@ function setLang(l){
 document.querySelector('.lang').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) setLang(b.dataset.lang); });
 
 /* ===== Démarrage ===== */
-if(!ORDER_OPEN){ $('#order').hidden=true; $('#orderBtn').hidden=true; document.querySelector('.top nav').hidden=true; }
+if(!ORDER_OPEN){ $('#orderNow').hidden=true; $('#order').hidden=true; $('#orderBtn').hidden=true; document.querySelector('.top nav').hidden=true; }
 setLang('en'); applyTheme(false);
 hero3d.build(); renderInfo();
 requestAnimationFrame(frame);
