@@ -466,11 +466,13 @@ function buildSachet(p, aniso){
   const bump=sachetBump(); bump.anisotropy=aniso;
   const front=new THREE.MeshPhysicalMaterial({color:new THREE.Color(p.back).convertSRGBToLinear(),metalness:.2,roughness:.34,clearcoat:.9,clearcoatRoughness:.12,
     envMapIntensity:1.15,bumpMap:bump,bumpScale:.9,emissive:0xffffff,emissiveIntensity:0});
-  const back=new THREE.MeshPhysicalMaterial({color:0xd8dbe2,metalness:.92,roughness:.3,clearcoat:.5,clearcoatRoughness:.2,
-    envMapIntensity:1.5,bumpMap:bump,bumpScale:.9});
+  /* verso : même impression que le recto (recto-verso) */
+  const back=new THREE.MeshPhysicalMaterial({color:new THREE.Color(p.back).convertSRGBToLinear(),metalness:.2,roughness:.34,clearcoat:.9,clearcoatRoughness:.12,
+    envMapIntensity:1.15,bumpMap:bump,bumpScale:.9,emissive:0xffffff,emissiveIntensity:0});
   loader().load(p.tex, tx=>{
     tx.encoding=THREE.sRGBEncoding; tx.anisotropy=aniso; tx.needsUpdate=true;
     front.color.set(0xffffff); front.map=tx; front.emissiveMap=tx; front.emissiveIntensity=.18; front.needsUpdate=true;
+    back.color.set(0xffffff); back.map=tx; back.emissiveMap=tx; back.emissiveIntensity=.18; back.needsUpdate=true;
   });
   const f=new THREE.Mesh(geo,front);
   const b=new THREE.Mesh(geo,back); b.rotation.y=Math.PI;
