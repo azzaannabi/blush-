@@ -651,7 +651,14 @@ function renderOrder(){
 }
 $('#qrows').addEventListener('click',e=>{
   const b=e.target.closest('[data-q]'); if(!b) return;
-  const id=b.dataset.id; qty[id]=Math.max(0,Math.min(99,qty[id]+Number(b.dataset.q)));
+  const id=b.dataset.id, d=Number(b.dataset.q), cur=qty[id], tot=totalQty();
+  if(d>0){
+    // premier « + » : on saute directement au minimum de commande (12), puis +1 à chaque clic
+    qty[id]=Math.min(99, cur===0 ? Math.max(1,MIN_QTY-tot) : cur+1);
+  } else {
+    // « − » : si on passe sous le minimum de commande, on remet ce produit à 0
+    qty[id]=(tot-1<MIN_QTY && cur>0) ? 0 : Math.max(0,cur-1);
+  }
   renderOrder();
 });
 
