@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Blush — Creatine + electrolytes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=DM+Sans:wght@400;500;600;700&family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+@property --bg{syntax:'<color>';inherits:true;initial-value:#FAC3D2}
+@property --fg{syntax:'<color>';inherits:true;initial-value:#6A0B2E}
+@property --ac{syntax:'<color>';inherits:true;initial-value:#F06A96}
+
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --page-bg:#FFF7EF;--page-fg:#1A1230;--card:#FFFFFF;--muted:#6B6378;--line:rgba(26,18,48,.16);
+  --pop:#E0457B;--pop-ink:#FFFFFF;--btn:#1A1230;--btn-ink:#FFF7EF;--err:#B3261E;
+  --serif:'Fraunces',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--page-bg:#15101F;--page-fg:#FBF1E6;--card:#211A31;--muted:#B2A9C2;--line:rgba(251,241,230,.2);--pop:#FF6F9E;--pop-ink:#1A1230;--btn:#FBF1E6;--btn-ink:#1A1230;--err:#FF8A80}
+}
+:root[data-theme="dark"]{--page-bg:#15101F;--page-fg:#FBF1E6;--card:#211A31;--muted:#B2A9C2;--line:rgba(251,241,230,.2);--pop:#FF6F9E;--pop-ink:#1A1230;--btn:#FBF1E6;--btn-ink:#1A1230;--err:#FF8A80}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--page-bg);color:var(--page-fg);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+[lang="ar"] body,[lang="ar"] input,[lang="ar"] textarea{font-family:'Cairo',var(--sans)}
+[lang="ar"] h1,[lang="ar"] h2,[lang="ar"] h3,[lang="ar"] .bundle b{font-family:'Cairo',sans-serif;letter-spacing:0}
+[hidden]{display:none!important}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid currentColor;outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--serif);margin:0;line-height:1.08}
+
+/* ---------- Hero ---------- */
+.hero{
+  --bg:#FAC3D2;--fg:#6A0B2E;--ac:#F06A96;
+  position:relative;overflow:hidden;color:var(--fg);background:var(--bg);
+  transition:--bg .8s ease,--fg .8s ease,--ac .8s ease;
+  padding:0 20px 30px;text-align:center;
+}
+.hero::before{
+  content:"";position:absolute;left:50%;top:50%;width:min(900px,160vw);aspect-ratio:1;translate:-50% -50%;
+  background:radial-gradient(closest-side,var(--ac),transparent);opacity:.85;pointer-events:none;
+}
+.ghost{
+  position:absolute;left:50%;top:48%;translate:-50% -50%;white-space:nowrap;
+  font:800 min(46vw,430px)/1 var(--serif);letter-spacing:-.06em;color:var(--fg);opacity:.1;pointer-events:none;user-select:none;
+}
+.top{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0;max-width:1100px;margin:0 auto}
+.brand{font:800 38px/1 var(--serif);letter-spacing:-.045em;color:inherit;text-decoration:none}
+.top nav{display:none;gap:22px}
+.top nav a{color:inherit;text-decoration:none;font-weight:500}
+@media(min-width:640px){.top nav{display:flex}}
+.lang{display:flex;gap:4px;padding:3px;border-radius:99px;background:color-mix(in srgb,var(--fg) 12%,transparent)}
+.lang button{border:0;background:none;padding:6px 12px;border-radius:99px;font-size:13px;font-weight:700}
+.lang button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+
+.hero h1{position:relative;z-index:2;font-weight:800;font-size:clamp(30px,6vw,64px);letter-spacing:-.035em;max-width:14em;margin:10px auto 0}
+.hero .sub{position:relative;z-index:2;max-width:30em;margin:10px auto 0;font-size:clamp(14px,2.3vw,17px);opacity:.85}
+
+.stage{
+  position:relative;z-index:3;height:min(580px,125vw);margin:0 -20px;
+  touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;direction:ltr;
+}
+.stage:active{cursor:grabbing}
+.stage canvas{display:block;width:100%;height:100%}
+.stage .fb{display:flex;justify-content:center;align-items:center;height:100%;gap:8px}
+.stage .fb img{height:80%;border-radius:12px;box-shadow:0 14px 30px rgba(0,0,0,.25)}
+/* Tampon « rupture de stock » : affiché seulement quand le produit de devant est épuisé */
+.stage::after{
+  content:attr(data-soldout);position:absolute;left:50%;top:46%;transform:translate(-50%,-50%) rotate(-8deg);z-index:4;pointer-events:none;
+  background:var(--fg);color:var(--bg);padding:10px 24px;border-radius:10px;
+  font:800 clamp(18px,4.6vw,30px)/1.1 var(--serif);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;
+  box-shadow:0 10px 26px rgba(0,0,0,.28);transition:opacity .3s
+}
+.stage[data-soldout=""]::after,.stage:not([data-soldout])::after{opacity:0}
+[lang="ar"] .stage::after{font-family:'Cairo',sans-serif;letter-spacing:0}
+
+.info{position:relative;z-index:4;max-width:34em;margin:4px auto 0}
+.pill{display:inline-block;padding:4px 14px;border:1.5px solid currentColor;border-radius:99px;font-size:13px;font-weight:700;letter-spacing:.04em}
+.info h2{font-size:clamp(30px,6vw,48px);font-weight:800;letter-spacing:-.03em;margin-top:8px}
+.info p{margin:6px auto 0;opacity:.88;font-size:15px}
+.info.swap{animation:swap .35s ease}
+@keyframes swap{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.actions{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:16px;direction:ltr}
+.btn{border:0;border-radius:99px;padding:14px 26px;font-weight:700;background:var(--fg);color:var(--bg);transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.arrow{width:46px;height:46px;border-radius:50%;border:1.5px solid currentColor;background:none;font-size:20px;line-height:1}
+.dots{position:relative;z-index:4;display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:18px;padding:0 6px}
+.dots button{width:30px;height:30px;border-radius:50%;border:2px solid var(--fg);padding:0;opacity:.6;transition:transform .2s,opacity .2s;background-size:cover;background-position:center}
+.dots button[aria-selected="true"]{opacity:1;transform:scale(1.22)}
+
+/* ---------- Galerie ---------- */
+.gallery h2{text-align:center}
+.gallery .grid{display:grid;gap:12px;grid-template-columns:1fr 1fr;max-width:900px;margin:26px auto 0}
+.gallery img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:22px;display:block}
+
+/* ---------- Commande (masquée tant que les prix ne sont pas définis) ---------- */
+section.block{padding:56px 20px}
+.narrow{max-width:760px;margin:0 auto}
+.block h2{font-size:clamp(30px,5vw,48px);font-weight:800;letter-spacing:-.03em}
+.lead{color:var(--muted);margin:10px 0 0;font-size:17px}
+.step{font-size:22px;font-weight:700;margin:34px 0 14px}
+.step small{font:500 14px var(--sans);color:var(--muted);margin-inline-start:8px}
+
+.minnote{margin:14px 0 0;font-weight:700;color:var(--pop)}
+.qrows{display:grid;gap:10px}
+.qrow{display:flex;align-items:center;gap:14px;background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:10px 14px;transition:border-color .2s}
+.qrow img{height:68px;width:68px;object-fit:cover;border-radius:12px;flex:none}
+.qrow .nm{flex:1;font-weight:700;line-height:1.25}
+.qrow .nm small{display:block;font-weight:500;color:var(--muted)}
+.qrow[data-on="true"]{border-color:var(--pop);box-shadow:inset 0 0 0 1px var(--pop)}
+.qrow.off{opacity:.6}
+.qrow.off img{filter:grayscale(.6)}
+.qrow.off .nm small{color:var(--muted);font-weight:700}
+.qty{display:flex;align-items:center;gap:6px;direction:ltr}
+.qty button{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--page-fg);background:none;font-size:22px;font-weight:700;line-height:1}
+.qty button:disabled{opacity:.3;cursor:not-allowed}
+.qty b{min-width:32px;text-align:center;font-size:18px}
+
+form{display:grid;gap:14px}
+.two{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:520px){.two{grid-template-columns:1fr 1fr}}
+.field label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+.field input,.field textarea{width:100%;font-size:16px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--page-fg)}
+.field textarea{min-height:92px;resize:vertical}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--pop);box-shadow:0 0 0 3px color-mix(in srgb,var(--pop) 25%,transparent)}
+.field[data-bad="true"] input,.field[data-bad="true"] textarea{border-color:var(--err)}
+.err{display:none;color:var(--err);font-size:13px;margin-top:5px;font-weight:600}
+.field[data-bad="true"] .err,.err.on{display:block}
+
+.summary{margin-top:8px;background:var(--pop);color:var(--pop-ink);border-radius:22px;padding:18px 20px;display:grid;gap:6px}
+.summary .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.summary .big{font:800 30px var(--serif)}
+[lang="ar"] .summary .big{font-family:'Cairo',sans-serif}
+.go{width:100%;margin-top:6px;padding:17px;font-size:17px;background:var(--btn);color:var(--btn-ink)}
+
+.done{background:var(--card);border:1.5px solid var(--pop);border-radius:24px;padding:22px}
+.done h3{font-size:26px;margin-bottom:10px}
+.done ul{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:4px}
+.done li{display:flex;justify-content:space-between;gap:12px}
+.done .who{color:var(--muted);margin:10px 0;white-space:pre-line}
+.done .note{background:color-mix(in srgb,var(--err) 12%,transparent);border-radius:12px;padding:10px 12px;font-size:14px;margin:12px 0}
+.done .acts{display:flex;gap:10px;flex-wrap:wrap}
+.done .btn{background:var(--btn);color:var(--btn-ink);text-decoration:none;display:inline-block}
+.done .btn.ghost2{background:none;color:var(--page-fg);border:1.5px solid var(--page-fg)}
+
+footer{padding:36px 20px 60px;text-align:center;color:var(--muted)}
+footer b{font:800 26px var(--serif);color:var(--page-fg);letter-spacing:-.04em}
+
+.orderbtn{
+  position:fixed;z-index:50;left:50%;translate:-50% 0;bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  display:flex;align-items:center;gap:10px;border:0;border-radius:99px;padding:14px 24px;font-weight:700;text-decoration:none;white-space:nowrap;
+  background:var(--pop);color:var(--pop-ink);box-shadow:0 8px 24px rgba(0,0,0,.3);transition:opacity .25s,transform .25s
+}
+.orderbtn.hide{opacity:0;pointer-events:none;transform:translateY(20px)}
+.toast{position:fixed;z-index:70;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));translate:-50% 0;background:#1A1230;color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<section class="hero" id="top">
+  <div class="ghost" aria-hidden="true">Blush</div>
+  <header class="top">
+    <a class="brand" href="#top">Blush</a>
+    <nav><a href="#order" data-i18n="nav_order"></a></nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button data-lang="en" aria-pressed="true">EN</button>
+      <button data-lang="fr" aria-pressed="false">FR</button>
+      <button data-lang="ar" aria-pressed="false">عربي</button>
+    </div>
+  </header>
+
+  <h1 data-i18n="hero_title"></h1>
+  <p class="sub" data-i18n="hero_sub"></p>
+
+  <div class="stage" id="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Blush"></div>
+
+  <div class="info" id="info" aria-live="polite">
+    <span class="pill" id="pill"></span>
+    <h2 id="fname"></h2>
+    <p id="fdesc"></p>
+    <div class="actions">
+      <button class="arrow" id="prev" aria-label="Previous">‹</button>
+      <button class="btn" id="heroAdd"></button>
+      <button class="arrow" id="next" aria-label="Next">›</button>
+    </div>
+  </div>
+  <div class="dots" id="dots" role="tablist"></div>
+</section>
+
+<section class="block gallery" id="gallery">
+  <h2 data-i18n="gal_title"></h2>
+  <div class="grid">
+    <img src="photos/action1.jpg" alt="Candy Pop" loading="lazy">
+    <img src="photos/action2.jpg" alt="Blush" loading="lazy">
+  </div>
+</section>
+
+<section class="block" id="order">
+  <div class="narrow">
+    <h2 data-i18n="order_title"></h2>
+    <p class="lead" data-i18n="lead"></p>
+    <p class="minnote" id="minNote"></p>
+
+    <h3 class="step" data-i18n="step_products"></h3>
+    <div class="qrows" id="qrows"></div>
+    <p class="err" id="qerr" role="alert"></p>
+
+    <h3 class="step" id="stepYou" data-i18n="step_you"></h3>
+    <form id="orderForm" novalidate>
+      <div class="two">
+        <div class="field"><label for="fLast" data-i18n="last"></label><input id="fLast" name="last" autocomplete="family-name" required><p class="err" data-i18n="e_req"></p></div>
+        <div class="field"><label for="fFirst" data-i18n="first"></label><input id="fFirst" name="first" autocomplete="given-name" required><p class="err" data-i18n="e_req"></p></div>
+      </div>
+      <div class="field"><label for="fPhone" data-i18n="phone"></label><input id="fPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" required><p class="err" data-i18n="e_phone"></p></div>
+      <div class="field"><label for="fAddr" data-i18n="address"></label><textarea id="fAddr" name="address" autocomplete="street-address" data-ph="ph_address" required></textarea><p class="err" data-i18n="e_req"></p></div>
+
+      <div class="summary" aria-live="polite">
+        <div class="row"><span data-i18n="items"></span><b id="sumCans">0</b></div>
+        <div class="row"><span data-i18n="subtotal"></span><b id="sumSub">0</b></div>
+        <div class="row"><span data-i18n="delivery"></span><b id="sumDel">0</b></div>
+        <div class="row"><span data-i18n="total"></span><span class="big" id="sumTotal">0</span></div>
+      </div>
+      <button class="btn go" type="submit" data-i18n="confirm"></button>
+    </form>
+    <div id="done" hidden></div>
+  </div>
+</section>
+
+<footer><b>Blush</b><p data-i18n="foot"></p></footer>
+
+<a class="orderbtn" id="orderBtn" href="#order"></a>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===== Réglages (à ajuster) ===== */
+const ORDER_OPEN = true;                 // false = masque toute la commande
+const MIN_QTY = 12;                      // commande minimum (pièces)
+const DELIVERY = 8;                      // frais de livraison (DT)
+const PRICES = {gummies:6, candy:6};     // prix en dinars par sachet (À AJUSTER)
+const CUR = {en:'DT', fr:'DT', ar:'د.ت'};
+const ORDER_ENDPOINT = '';               // URL du script Google Apps Script (envoie chaque commande dans le Google Sheet)
+const WHATSAPP = '';                     // ex. '21612345678' : active l'envoi de la commande par WhatsApp
+
+/* ===== Les produits =====
+   kind 'can' = canette 3D ; kind 'sachet' = sachet carré 3D.  soldout:true = tampon « rupture de stock » */
+const P = [
+  {id:'gummies', kind:'sachet', aspect:1.132, bg:'#FAC3D2', fg:'#6A0B2E', ac:'#F06A96', back:'#E0557F',
+    tex:'sachets/gummies.jpg',  thumb:'sachets/gummies_thumb.jpg'},
+  {id:'candy',   kind:'sachet', bg:'#FCE3A8', fg:'#7A1030', ac:'#F7C23C', back:'#F2B25A',
+    tex:'sachets/candypop.jpg', thumb:'sachets/candypop_thumb.jpg'},
+  {id:'matcha', kind:'can', soon:true, bg:'#D3E4B8', fg:'#2F4A14', ac:'#8DB84F', top:'#4f7f22', bot:'#b9cf8b',
+    tex:'cans/matcha.jpg', thumb:'cans/matcha_thumb.jpg'},
+  {id:'mane',   kind:'can', soon:true, bg:'#C3DBF1', fg:'#4A3320', ac:'#86B6E2', top:'#9c7650', bot:'#d9bf9c',
+    tex:'cans/mane.jpg', thumb:'cans/mane_thumb.jpg'},
+  {id:'pool',    kind:'can',    bg:'#F7B9C8', fg:'#5E0B2B', ac:'#EE6F97', top:'#d35e7e', bot:'#bd506b', soldout:true,
+    tex:'cans/tex01.jpg', thumb:'cans/thumb01.jpg'}
+];
+const N = P.length;
+
+/* ===== Traductions ===== */
+const I18N = {
+  en:{nav_order:'Order',
+    hero_title:'Your dose of creatine and electrolytes, all in 1.',
+    hero_sub:'For your muscles, your mind and your skin. Your body will thank you.',
+    soldout:'Out of stock', soon:'Coming soon',
+    pn_matcha:'Matcha Latte', pt_matcha:'Collagen +', pd_matcha:'Matcha latte with collagen +, 250 ml can.',
+    pn_mane:'Lion’s Mane', pt_mane:'Focus +', pd_mane:'Lion’s mane mushroom, focus +, 250 ml can.', gal_title:'Always in your pocket',
+    pn_gummies:'Red fruit gummies', pt_gummies:'Gummies', pd_gummies:'Round gummies with creatine + electrolytes, red fruit flavor.',
+    pn_candy:'Candy Pop', pt_candy:'Popping powder', pd_candy:'Creatine + electrolytes powder with popping sugar that crackles on your tongue. Red fruit.',
+    pn_pool:'Poolside', pt_pool:'Sparkling can', pd_pool:'The sparkling can, creatine + electrolytes.',
+    design:'Design', pick_this:'Order this design', picked:'Design selected',
+    order_title:'Place your order',
+    lead:'Pick your products, then tell us where to deliver.', step_products:'Choose your products', each:'each', items:'Items', add:'Add to order', added:'Added to your order', e_none:'Add at least one product.', min_note:'Minimum order: {n} pieces · Delivery: {d}', e_min:'Minimum order is {n} pieces. {r} more to go.', subtotal:'Subtotal', delivery:'Delivery',
+    step_pack:'Pick a pack',step_one:'Choose your design',step_mix:'Your assortment',mix_note:'No need to choose: we pack a balanced assortment.',step_you:'Where do we deliver?',
+    pk_p6:'Pack of 6',pkd_p6:'6 cans, one design',
+    pk_m12:'Mix of 12',pkd_m12:'12 cans, assorted designs',
+    pk_m24:'Mix of 24',pkd_m24:'24 cans, assorted designs',
+    cans:'cans',can:'can',pack:'Pack',save:'Save {x}',
+    surprise:'Surprise me',clear:'Clear',of:'of',
+    last:'Last name',first:'First name',phone:'Phone number',address:'Address',ph_address:'Street, number, city',
+    cans_total:'Cans',total:'Total',confirm:'Confirm my order',
+    e_req:'This field is required.',e_phone:'Enter a valid phone number.',
+    e_design:'Pick a design for your pack.',e_mix:'Your pack needs exactly {n} cans. {r} to go.',
+    done_title:'Your order',done_lead:'Check your details, then send your order.',
+    preview:'Preview: orders are not sent yet.',sending:'Sending…',sent_lead:'Thank you! Your order is received, we will call you to confirm it.',e_send:'Your order could not be sent. Check your connection and try again.',wa:'Send on WhatsApp',edit:'Edit my order',
+    foot:'Creatine + electrolytes.',order_cta:'Order'},
+  fr:{nav_order:'Commander',
+    hero_title:'Votre dose de créatine et d’électrolytes, le tout en 1.',
+    hero_sub:'Pour vos muscles, votre mental et votre peau. Votre corps vous remerciera.',
+    soldout:'Rupture de stock', soon:'Bientôt disponible',
+    pn_matcha:'Matcha Latte', pt_matcha:'Collagène +', pd_matcha:'Matcha latte au collagène +, canette 250 ml.',
+    pn_mane:'Lion’s Mane', pt_mane:'Focus +', pd_mane:'Champignon Lion’s Mane, focus +, canette 250 ml.', gal_title:'Toujours dans votre poche',
+    pn_gummies:'Gummies fruits rouges', pt_gummies:'Gummies', pd_gummies:'Des gummies ronds à la créatine et aux électrolytes, goût fruits rouges.',
+    pn_candy:'Candy Pop', pt_candy:'Poudre pétillante', pd_candy:'Poudre créatine + électrolytes avec du sucre pétillant qui crépite sur la langue. Fruits rouges.',
+    pn_pool:'Poolside', pt_pool:'Canette pétillante', pd_pool:'La canette pétillante, créatine + électrolytes.',
+    design:'Design', pick_this:'Commander ce design', picked:'Design sélectionné',
+    order_title:'Passer commande',
+    lead:'Choisis tes produits, puis dis-nous où livrer.', step_products:'Choisis tes produits', each:'pièce', items:'Articles', add:'Ajouter à la commande', added:'Ajouté à ta commande', e_none:'Ajoute au moins un produit.', min_note:'Commande minimum : {n} pièces · Livraison : {d}', e_min:'La commande minimum est de {n} pièces. Il en manque {r}.', subtotal:'Sous-total', delivery:'Livraison',
+    step_pack:'Choisis un pack',step_one:'Choisis ton design',step_mix:'Ton assortiment',mix_note:'Pas de choix à faire : on prépare un assortiment équilibré.',step_you:'Où livrer ?',
+    pk_p6:'Pack de 6',pkd_p6:'6 canettes, un seul design',
+    pk_m12:'Mix de 12',pkd_m12:'12 canettes, designs assortis',
+    pk_m24:'Mix de 24',pkd_m24:'24 canettes, designs assortis',
+    cans:'canettes',can:'canette',pack:'Pack',save:'{x} d’économie',
+    surprise:'Surprends-moi',clear:'Effacer',of:'sur',
+    last:'Nom',first:'Prénom',phone:'Numéro de téléphone',address:'Adresse',ph_address:'Rue, numéro, ville',
+    cans_total:'Canettes',total:'Total',confirm:'Confirmer ma commande',
+    e_req:'Ce champ est obligatoire.',e_phone:'Entre un numéro de téléphone valide.',
+    e_design:'Choisis un design pour ton pack.',e_mix:'Ton pack doit contenir exactement {n} canettes. Il en manque {r}.',
+    done_title:'Ta commande',done_lead:'Vérifie tes informations, puis envoie ta commande.',
+    preview:'Aperçu : les commandes ne sont pas encore envoyées.',sending:'Envoi…',sent_lead:'Merci ! Ta commande est bien reçue, on t’appelle pour la confirmer.',e_send:'Ta commande n’a pas pu être envoyée. Vérifie ta connexion et réessaie.',wa:'Envoyer sur WhatsApp',edit:'Modifier ma commande',
+    foot:'Créatine + électrolytes.',order_cta:'Commander'},
+  ar:{nav_order:'اطلب',
+    hero_title:'جرعتك من الكرياتين والإلكتروليت، كلّها في علبة واحدة.',
+    hero_sub:'لعضلاتك وذهنك وبشرتك. جسمك سيشكرك.',
+    soldout:'نفدت الكمية', soon:'قريبًا',
+    pn_matcha:'Matcha Latte', pt_matcha:'كولاجين +', pd_matcha:'ماتشا لاتيه بالكولاجين +، علبة 250 مل.',
+    pn_mane:'Lion’s Mane', pt_mane:'تركيز +', pd_mane:'فطر عرف الأسد (Lion’s Mane)، تركيز +، علبة 250 مل.', gal_title:'دائمًا في جيبك',
+    pn_gummies:'غومي الفواكه الحمراء', pt_gummies:'غومي', pd_gummies:'حلوى غومي دائرية بالكرياتين والإلكتروليت بنكهة الفواكه الحمراء.',
+    pn_candy:'Candy Pop', pt_candy:'بودرة فوّارة', pd_candy:'بودرة كرياتين + إلكتروليت مع سكر فوّار يطقطق على لسانك. فواكه حمراء.',
+    pn_pool:'Poolside', pt_pool:'علبة فوّارة', pd_pool:'العلبة الفوّارة، كرياتين + إلكتروليت.',
+    design:'التصميم', pick_this:'اطلب هذا التصميم', picked:'تم اختيار التصميم',
+    order_title:'أكمل طلبك',
+    lead:'اختر منتجاتك ثم أخبرنا أين نوصّل.', step_products:'اختر منتجاتك', each:'للقطعة', items:'المنتجات', add:'أضف إلى الطلب', added:'تمت الإضافة إلى طلبك', e_none:'أضف منتجًا واحدًا على الأقل.', min_note:'الحد الأدنى للطلب: {n} قطعة · التوصيل: {d}', e_min:'الحد الأدنى للطلب {n} قطعة. ينقصك {r}.', subtotal:'المجموع الفرعي', delivery:'التوصيل',
+    step_pack:'اختر باقة',step_one:'اختر تصميمك',step_mix:'تشكيلتك',mix_note:'لا حاجة للاختيار: نجهّز لك تشكيلة متوازنة.',step_you:'أين نوصّل؟',
+    pk_p6:'باقة 6 علب',pkd_p6:'6 علب بتصميم واحد',
+    pk_m12:'مزيج 12 علبة',pkd_m12:'12 علبة بتصاميم متنوعة',
+    pk_m24:'مزيج 24 علبة',pkd_m24:'24 علبة بتصاميم متنوعة',
+    cans:'علب',can:'علبة',pack:'الباقة',save:'وفّر {x}',
+    surprise:'فاجئني',clear:'مسح',of:'من',
+    last:'اللقب',first:'الاسم',phone:'رقم الهاتف',address:'العنوان',ph_address:'الشارع، الرقم، المدينة',
+    cans_total:'العلب',total:'المجموع',confirm:'تأكيد طلبي',
+    e_req:'هذا الحقل مطلوب.',e_phone:'أدخل رقم هاتف صالحًا.',
+    e_design:'اختر تصميمًا لباقتك.',e_mix:'يجب أن تحتوي باقتك على {n} علبة بالضبط. ينقصك {r}.',
+    done_title:'طلبك',done_lead:'تحقق من معلوماتك ثم أرسل طلبك.',
+    preview:'معاينة: الطلبات لا تُرسل بعد.',sending:'جارٍ الإرسال…',sent_lead:'شكرًا! تم استلام طلبك وسنتصل بك لتأكيده.',e_send:'تعذّر إرسال طلبك. تحقق من الاتصال وحاول مجددًا.',wa:'إرسال عبر واتساب',edit:'تعديل طلبي',
+    foot:'كرياتين + إلكتروليت.',order_cta:'اطلب'}
+};
+
+/* ===== État ===== */
+const $ = s => document.querySelector(s);
+const mod = (a,n) => ((a % n) + n) % n;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let lang='en', idx=0;
+const t = k => (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k;
+const pname = p => t('pn_'+p.id);
+const money = n => n + ' ' + CUR[lang];
+
+/* ===== Carousel 3D (WebGL / three.js) ===== */
+const stage = $('#stage'), hero = $('.hero');
+const SHARED = {env:null, shadow:null};
+
+function makeEnv(){
+  const c=document.createElement('canvas'); c.width=1024; c.height=512; const g=c.getContext('2d');
+  const gr=g.createLinearGradient(0,0,0,512);
+  gr.addColorStop(0,'#cfd0d8'); gr.addColorStop(.45,'#7d7d88'); gr.addColorStop(.5,'#c9c0b6'); gr.addColorStop(1,'#6a625b');
+  g.fillStyle=gr; g.fillRect(0,0,1024,512);
+  const box=(x,w,a)=>{ const bg=g.createLinearGradient(x,0,x+w,0);
+    bg.addColorStop(0,'rgba(255,255,255,0)'); bg.addColorStop(.12,`rgba(255,255,255,${a})`); bg.addColorStop(.88,`rgba(255,255,255,${a})`); bg.addColorStop(1,'rgba(255,255,255,0)');
+    g.fillStyle=bg; g.fillRect(x,10,w,330); };
+  box(70,90,1); box(330,60,.9); box(560,130,1); box(850,70,.95);
+  g.fillStyle='rgba(255,247,235,.85)'; g.fillRect(0,0,1024,26);
+  const tex=new THREE.CanvasTexture(c);
+  tex.mapping=THREE.EquirectangularReflectionMapping; tex.encoding=THREE.sRGBEncoding;
+  return tex;
+}
+function glossTexture(){
+  const c=document.createElement('canvas'); c.width=512; c.height=256; const g=c.getContext('2d');
+  g.clearRect(0,0,512,256);
+  const streak=(u,w,a)=>{ const x=u*512, gr=g.createLinearGradient(x-w*512,0,x+w*512,0);
+    gr.addColorStop(0,'rgba(255,255,255,0)'); gr.addColorStop(.5,`rgba(255,255,255,${a})`); gr.addColorStop(1,'rgba(255,255,255,0)');
+    g.fillStyle=gr; g.fillRect(x-w*512,0,w*1024,256); };
+  streak(.37,.045,.75); streak(.31,.012,.9); streak(.66,.02,.4); streak(.72,.07,.14);
+  g.globalCompositeOperation='destination-in';
+  const v=g.createLinearGradient(0,0,0,256);
+  v.addColorStop(0,'rgba(0,0,0,0)'); v.addColorStop(.1,'rgba(0,0,0,1)'); v.addColorStop(.88,'rgba(0,0,0,1)'); v.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=v; g.fillRect(0,0,512,256);
+  return new THREE.CanvasTexture(c);
+}
+function shadowTexture(){
+  const c=document.createElement('canvas'); c.width=c.height=128; const g=c.getContext('2d');
+  const gr=g.createRadialGradient(64,64,0,64,64,64);
+  gr.addColorStop(0,'rgba(0,0,0,.62)'); gr.addColorStop(.55,'rgba(0,0,0,.22)'); gr.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=gr; g.fillRect(0,0,128,128);
+  return new THREE.CanvasTexture(c);
+}
+const loader = () => (SHARED.loader = SHARED.loader || new THREE.TextureLoader());
+function buildCan(p, aniso){
+  const BH=4.9, top=BH/2, bot=-BH/2;
+  const holder=new THREE.Group(), can=new THREE.Group(); holder.add(can);
+  const gloss={metalness:.35,roughness:.22,clearcoat:1,clearcoatRoughness:.04,envMapIntensity:1.3,emissive:0xffffff,emissiveIntensity:0};
+  const bodyMat = new THREE.MeshPhysicalMaterial(Object.assign({color:0xffffff},gloss));
+  const shMat = new THREE.MeshPhysicalMaterial(Object.assign({color:new THREE.Color(p.top).convertSRGBToLinear(),side:THREE.DoubleSide},gloss));
+  const btMat = new THREE.MeshPhysicalMaterial(Object.assign({color:new THREE.Color(p.bot).convertSRGBToLinear(),side:THREE.DoubleSide},gloss));
+  loader().load(p.tex, tx=>{
+    tx.encoding=THREE.sRGBEncoding; tx.anisotropy=aniso; tx.needsUpdate=true;
+    bodyMat.map=tx; bodyMat.emissiveMap=tx; bodyMat.emissiveIntensity=.16; bodyMat.needsUpdate=true;
+    const band=(offY,repY)=>{ const c=tx.clone(); c.wrapS=THREE.RepeatWrapping; c.offset.set(.5,offY); c.repeat.set(1,repY); c.needsUpdate=true; return c; };
+    shMat.color.set(0xffffff); shMat.map=band(1,-.07); shMat.emissive.set(0xffffff); shMat.emissiveMap=shMat.map; shMat.emissiveIntensity=.12; shMat.needsUpdate=true;
+    btMat.color.set(0xffffff); btMat.map=band(.13,-.05); btMat.emissive.set(0xffffff); btMat.emissiveMap=btMat.map; btMat.emissiveIntensity=.1; btMat.needsUpdate=true;
+  });
+  const metal = new THREE.MeshStandardMaterial({color:0xe2e2e2,metalness:1,roughness:.2,envMapIntensity:1.3,side:THREE.DoubleSide});
+  can.add(new THREE.Mesh(new THREE.CylinderGeometry(1,1,BH,96,1,true,Math.PI,Math.PI*2),bodyMat));
+  const V=(x,y)=>new THREE.Vector2(x,y);
+  const add=(geo,mat,y)=>{ const m=new THREE.Mesh(geo,mat); m.position.y=y; can.add(m); return m; };
+  add(new THREE.LatheGeometry([V(1,0),V(.995,.05),V(.98,.12),V(.94,.21),V(.9,.29),V(.87,.35),V(.865,.38)],96),shMat,top);
+  add(new THREE.LatheGeometry([V(.865,.38),V(.895,.42),V(.9,.47),V(.86,.5),V(.81,.48),V(.785,.44),V(0,.44)],96),metal,top);
+  const bead=add(new THREE.TorusGeometry(.872,.022,10,96),metal,top+.37); bead.rotation.x=Math.PI/2;
+  const score=add(new THREE.TorusGeometry(.56,.016,8,64),metal,top+.445); score.rotation.x=Math.PI/2;
+  const tab=add(new THREE.CylinderGeometry(.34,.34,.04,40),metal,top+.47); tab.scale.set(1.05,1,.62); tab.position.x=.14;
+  const ring=add(new THREE.TorusGeometry(.13,.035,10,32),metal,top+.475); ring.rotation.x=Math.PI/2; ring.position.x=.4;
+  const rivet=add(new THREE.SphereGeometry(.06,16,12),metal,top+.5); rivet.position.x=-.12;
+  add(new THREE.LatheGeometry([V(.88,-.22),V(.92,-.18),V(.97,-.1),V(1,0)],96),btMat,bot);
+  const bbead=add(new THREE.TorusGeometry(.885,.02,10,96),metal,bot-.22); bbead.rotation.x=Math.PI/2;
+  add(new THREE.LatheGeometry([V(0,-.18),V(.7,-.2),V(.78,-.22),V(.84,-.26),V(.88,-.22)],96),metal,bot);
+  const glossMesh=new THREE.Mesh(new THREE.CylinderGeometry(1.012,1.012,BH,64,1,true,Math.PI,Math.PI*2),
+    new THREE.MeshBasicMaterial({map:SHARED.gloss,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:.8,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+  holder.add(glossMesh);
+  const sh = new THREE.Mesh(new THREE.PlaneGeometry(3.6,3.6),new THREE.MeshBasicMaterial({map:SHARED.shadow,transparent:true,depthWrite:false}));
+  sh.rotation.x=-Math.PI/2; sh.position.y=bot-.3; can.add(sh);
+  return {holder,can,spin:0,spinT:0};
+}
+
+/* Sachet 3D : pochette aluminium bombée, soudures crantées, léger froissé */
+function sachetBump(){
+  // relief très doux : seulement de fines soudures en haut et en bas, pas de rayures
+  const c=document.createElement('canvas'); c.width=256; c.height=512; const g=c.getContext('2d');
+  g.fillStyle='#808080'; g.fillRect(0,0,256,512);
+  const band=(y0,y1)=>{ for(let y=y0;y<y1;y+=8){
+    g.fillStyle='#9a9a9a'; g.fillRect(0,y,256,4); g.fillStyle='#6a6a6a'; g.fillRect(0,y+4,256,4); } };
+  band(0,40); band(472,512);
+  const tex=new THREE.CanvasTexture(c); tex.anisotropy=8; return tex;
+}
+function buildSachet(p, aniso){
+  const S=3.7, h=S/2;
+  const holder=new THREE.Group(), can=new THREE.Group(); holder.add(can);
+  const sm=(a,b,x)=>{ const t=Math.max(0,Math.min(1,(x-a)/(b-a))); return t*t*(3-2*t); };
+  const geo=new THREE.PlaneGeometry(S,S,96,96), pos=geo.attributes.position;
+  for(let i=0;i<pos.count;i++){
+    const u=pos.getX(i)/h, v=pos.getY(i)/h;
+    const xf=1-sm(.80,.95,Math.abs(u)), yf=1-sm(.78,.90,Math.abs(v));          // bords et soudures restent plats
+    const dome=Math.pow(Math.max(0,1-u*u),.35)*Math.pow(Math.max(0,1-v*v),.45);  // bombé « coussin »
+    const wr=.035*Math.sin(u*7+v*2.4)+.02*Math.sin(u*13-v*5)+.015*Math.sin(v*11+u*3);
+    pos.setZ(i,.02+(.36*dome+wr)*xf*yf);
+  }
+  geo.computeVertexNormals();
+  const bump=sachetBump(); bump.anisotropy=aniso;
+  const front=new THREE.MeshPhysicalMaterial({color:new THREE.Color(p.back).convertSRGBToLinear(),metalness:.2,roughness:.34,clearcoat:.9,clearcoatRoughness:.12,
+    envMapIntensity:1.15,bumpMap:bump,bumpScale:.9,emissive:0xffffff,emissiveIntensity:0});
+  const back=new THREE.MeshPhysicalMaterial({color:0xd8dbe2,metalness:.92,roughness:.3,clearcoat:.5,clearcoatRoughness:.2,
+    envMapIntensity:1.5,bumpMap:bump,bumpScale:.9});
+  loader().load(p.tex, tx=>{
+    tx.encoding=THREE.sRGBEncoding; tx.anisotropy=aniso; tx.needsUpdate=true;
+    front.color.set(0xffffff); front.map=tx; front.emissiveMap=tx; front.emissiveIntensity=.18; front.needsUpdate=true;
+  });
+  const f=new THREE.Mesh(geo,front);
+  const b=new THREE.Mesh(geo,back); b.rotation.y=Math.PI;
+  const pack=new THREE.Group(); pack.add(f,b); pack.scale.y=p.aspect||1; pack.position.y=-.45; pack.rotation.x=-.05; can.add(pack);
+  const sh=new THREE.Mesh(new THREE.PlaneGeometry(3.6,3.6),new THREE.MeshBasicMaterial({map:SHARED.shadow,transparent:true,depthWrite:false}));
+  sh.rotation.x=-Math.PI/2; sh.position.y=-2.75; can.add(sh);
+  return {holder,can,spin:0,spinT:0};
+}
+
+/* Anneau 3D : le produit de devant est le plus grand */
+class Ring{
+  constructor(el, ids, o){
+    this.el=el; this.ids=ids; this.n=ids.length; this.step=2*Math.PI/ids.length; this.o=o||{};
+    this.rot=0; this.target=0; this.idx=0; this.dragging=false; this.moved=0; this.interacted=false;
+    this.mx=0; this.my=0; this.smx=0; this.smy=0; this.visible=true; this.cans=[]; this.ok=false;
+    this.sx=0; this.sr=0; this.lastRot=0; this.lastT=0; this.vel=0;
+    this.bind();
+  }
+  build(){
+    if(typeof THREE==='undefined') return;
+    try{
+      const r=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
+      r.setPixelRatio(Math.min(devicePixelRatio||1,2)); r.outputEncoding=THREE.sRGBEncoding; r.setClearColor(0x000000,0);
+      if(!SHARED.env){ SHARED.env=makeEnv(); SHARED.shadow=shadowTexture(); SHARED.gloss=glossTexture(); }
+      const scene=new THREE.Scene(); scene.environment=SHARED.env;
+      scene.add(new THREE.HemisphereLight(0xffffff,0x9a8478,.45));
+      const key=new THREE.DirectionalLight(0xffffff,.85); key.position.set(5,6,9); scene.add(key);
+      const rim=new THREE.DirectionalLight(0xffffff,.55); rim.position.set(-6,4,-6); scene.add(rim);
+      const aniso=r.capabilities.getMaxAnisotropy();
+      this.ids.forEach((pi,i)=>{ const pr=P[pi]; const c=(pr.kind==='sachet'?buildSachet:buildCan)(pr,aniso); c.holder.userData.i=i; scene.add(c.holder); this.cans.push(c); });
+      this.renderer=r; this.scene=scene; this.camera=new THREE.PerspectiveCamera(30,1,4,60); this.ray=new THREE.Raycaster();
+      this.el.innerHTML=''; this.el.append(r.domElement);
+      new ResizeObserver(()=>this.resize()).observe(this.el);
+      new IntersectionObserver(es=>{ this.visible=es[0].isIntersecting; }).observe(this.el);
+      this.ok=true; this.resize();
+    }catch(e){ console.warn('WebGL indisponible',e); this.ok=false; }
+  }
+  resize(){
+    if(!this.ok) return;
+    const w=this.el.clientWidth, h=this.el.clientHeight; if(!w||!h) return;
+    this.renderer.setSize(w,h,false);
+    this.camera.aspect=w/h;
+    this.R=this.o.radius(w/h);
+    this.camera.position.set(0,2.3,this.R+13.5);
+    this.camera.lookAt(0,0.1,this.R*0.4);
+    this.camera.updateProjectionMatrix();
+  }
+  goTo(i){ const b=Math.round(this.rot); this.target=b+(mod(i-b+this.n/2,this.n)-this.n/2); }
+  move(d){ this.interacted=true; this.target=Math.round(this.rot)+d; }
+  pick(cx,cy){
+    const r=this.el.getBoundingClientRect();
+    const v=new THREE.Vector2(((cx-r.left)/r.width)*2-1, -((cy-r.top)/r.height)*2+1);
+    this.ray.setFromCamera(v,this.camera);
+    const hits=this.ray.intersectObjects(this.cans.map(c=>c.holder),true);
+    if(!hits.length) return -1;
+    let o=hits[0].object; while(o && o.userData.i===undefined) o=o.parent;
+    return o?o.userData.i:-1;
+  }
+  bind(){
+    const el=this.el;
+    el.addEventListener('pointerdown',e=>{ this.dragging=true; this.interacted=true; this.moved=0; this.sx=e.clientX; this.sr=this.rot; this.lastRot=this.rot; this.lastT=performance.now(); this.vel=0; });
+    addEventListener('pointermove',e=>{
+      const r=el.getBoundingClientRect();
+      this.mx=Math.max(-1,Math.min(1,((e.clientX-r.left)/r.width)*2-1));
+      this.my=Math.max(-1,Math.min(1,((e.clientY-r.top)/r.height)*2-1));
+      if(!this.dragging) return;
+      const dx=e.clientX-this.sx; this.moved=Math.max(this.moved,Math.abs(dx));
+      this.rot=this.sr-dx/Math.max(110,el.clientWidth*0.3); this.target=this.rot;
+      const now=performance.now(), dt=now-this.lastT;
+      if(dt>0){ this.vel=0.6*this.vel+0.4*((this.rot-this.lastRot)/dt); this.lastRot=this.rot; this.lastT=now; }
+    });
+    const end=e=>{
+      if(!this.dragging) return; this.dragging=false;
+      if(this.moved<6 && this.ok && e && e.clientX!==undefined){
+        const i=this.pick(e.clientX,e.clientY);
+        if(i===this.idx) this.cans[i].spinT+=Math.PI*2;
+        else if(i>=0) this.goTo(i);
+        else this.target=Math.round(this.rot);
+      } else {
+        const b=Math.round(this.rot);
+        this.target=Math.max(b-2,Math.min(b+2,Math.round(this.rot+this.vel*170)));
+      }
+    };
+    addEventListener('pointerup',end); addEventListener('pointercancel',()=>end());
+    el.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft') this.move(-1); if(e.key==='ArrowRight') this.move(1); });
+    if(!reduced) setInterval(()=>{ if(!this.interacted && !document.hidden && this.visible) this.target=Math.round(this.rot)+1; }, this.o.auto||4500);
+  }
+  tick(T){
+    if(!this.dragging){
+      this.rot+=(this.target-this.rot)*(reduced?1:0.11);
+      if(Math.abs(this.target-this.rot)<0.0005) this.rot=this.target;
+    }
+    const ni=mod(Math.round(this.rot),this.n);
+    if(ni!==this.idx){ this.idx=ni; if(this.o.onIndex) this.o.onIndex(ni); }
+    if(!this.ok||!this.visible) return;
+    this.smx+=(this.mx-this.smx)*.08; this.smy+=(this.my-this.smy)*.08;
+    const minS=this.o.minScale||0.66;
+    this.cans.forEach((c,i)=>{
+      const d=mod(i-this.rot+this.n/2,this.n)-this.n/2, th=d*this.step, front=Math.max(0,Math.cos(th));
+      const f2=front*front, s=minS+(1-minS)*f2;
+      const fl=reduced?0:Math.sin(T*1.1+i*1.3)*.07;
+      c.holder.scale.setScalar(s);
+      c.holder.position.set(Math.sin(th)*this.R, fl-(1-s)*2.75, Math.cos(th)*this.R);
+      c.spin+=(c.spinT-c.spin)*.08;
+      const f4=f2*f2;
+      c.can.rotation.y=th+c.spin+(reduced?0:Math.sin(T*.7+i)*.09*f4)+this.smx*.35*f4;
+      c.can.rotation.x=this.smy*.07*f4;
+      c.can.rotation.z=reduced?0:Math.sin(T*.8+i*2)*.025;
+    });
+    this.renderer.render(this.scene,this.camera);
+  }
+}
+
+const hero3d = new Ring(stage, P.map((_,i)=>i), {
+  radius:a=>a<1?4.6:5.6, minScale:.62, auto:4500,
+  onIndex:i=>{ idx=i; applyTheme(true); }
+});
+function goTo(i){ hero3d.interacted=true; hero3d.goTo(i); }
+function frame(time){ hero3d.tick(time/1000); requestAnimationFrame(frame); }
+
+/* ===== Thème + infos du hero ===== */
+const dots=$('#dots');
+P.forEach((p,i)=>{
+  const b=document.createElement('button'); b.type='button'; b.style.backgroundImage=`url(${p.thumb})`; b.setAttribute('role','tab');
+  b.onclick=()=>goTo(i); dots.append(b);
+});
+function renderInfo(){
+  const p=P[idx];
+  $('#pill').textContent=t('pt_'+p.id);
+  $('#fname').textContent=pname(p);
+  $('#fdesc').textContent=t('pd_'+p.id);
+  stage.dataset.soldout=p.soldout?t('soldout'):(p.soon?t('soon'):'');
+  const add=$('#heroAdd');
+  if(p.soldout||p.soon){ add.hidden=false; add.disabled=true; add.textContent=p.soldout?t('soldout'):t('soon'); }
+  else if(ORDER_OPEN){ add.hidden=false; add.disabled=false; add.textContent=t('add'); }
+  else { add.hidden=true; }
+  [...dots.children].forEach((b,i)=>{ b.setAttribute('aria-selected',i===idx); b.setAttribute('aria-label',pname(P[i])); });
+  if(!hero3d.ok) stage.innerHTML=`<div class="fb"><img src="${p.thumb}" alt="${pname(p)}"></div>`;
+}
+function applyTheme(anim){
+  const p=P[idx];
+  hero.style.setProperty('--bg',p.bg); hero.style.setProperty('--fg',p.fg); hero.style.setProperty('--ac',p.ac);
+  renderInfo();
+  if(anim){ const info=$('#info'); info.classList.remove('swap'); void info.offsetWidth; info.classList.add('swap'); }
+}
+$('#prev').onclick=()=>hero3d.move(-1);
+$('#next').onclick=()=>hero3d.move(1);
+$('#heroAdd').onclick=()=>{
+  const id=P[idx].id; qty[id]=Math.max(MIN_QTY,qty[id]); renderOrder(); toast(t('added'));
+  goOrder();
+};
+/* Va directement au formulaire (titre « Où livrer ? » puis Nom), puis corrige si le défilement a dérivé */
+function goOrder(){
+  const el=$('#stepYou');
+  const y=()=>el.getBoundingClientRect().top+window.pageYOffset-16;
+  window.scrollTo({top:y(),behavior:reduced?'auto':'smooth'});
+  setTimeout(()=>{ if(Math.abs(el.getBoundingClientRect().top-16)>24) window.scrollTo({top:y(),behavior:'auto'}); },900);
+}
+$('#orderBtn').addEventListener('click',e=>{ e.preventDefault(); goOrder(); });
+
+/* ===== Commande ===== */
+const qty = {}; P.forEach(p=>{ qty[p.id]=0; });
+const avail = P.filter(p=>!p.soldout && !p.soon);
+const totalQty = () => avail.reduce((a,p)=>a+qty[p.id],0);
+const subPrice = () => avail.reduce((a,p)=>a+qty[p.id]*PRICES[p.id],0);
+const totalPrice = () => subPrice()+DELIVERY;
+function renderOrder(){
+  $('#qrows').innerHTML=P.map(p=>{
+    const img=`<img src="${p.thumb}" alt="">`;
+    if(p.soldout||p.soon) return `<div class="qrow off">${img}<div class="nm">${pname(p)}<small>${p.soldout?t('soldout'):t('soon')}</small></div></div>`;
+    const q=qty[p.id];
+    return `<div class="qrow" data-on="${q>0}">${img}<div class="nm">${pname(p)}<small>${money(PRICES[p.id])} · ${t('each')}</small></div>
+      <div class="qty"><button type="button" data-q="-1" data-id="${p.id}" aria-label="−" ${q?'':'disabled'}>−</button><b>${q}</b><button type="button" data-q="1" data-id="${p.id}" aria-label="+">+</button></div></div>`;
+  }).join('');
+  $('#minNote').textContent=t('min_note').replace('{n}',MIN_QTY).replace('{d}',money(DELIVERY));
+  $('#sumCans').textContent=`${totalQty()} / ${MIN_QTY}`; $('#sumSub').textContent=money(subPrice());
+  $('#sumDel').textContent=money(DELIVERY); $('#sumTotal').textContent=money(totalPrice());
+  $('#qerr').classList.remove('on');
+  $('#orderBtn').textContent=t('order_cta')+(totalQty()?` · ${totalQty()}/${MIN_QTY}`:'');
+}
+$('#qrows').addEventListener('click',e=>{
+  const b=e.target.closest('[data-q]'); if(!b) return;
+  const id=b.dataset.id; qty[id]=Math.max(0,Math.min(99,qty[id]+Number(b.dataset.q)));
+  renderOrder();
+});
+
+const form=$('#orderForm');
+function setBad(input,bad){ input.closest('.field').dataset.bad=bad; }
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  let ok=true;
+  if(totalQty()<MIN_QTY){
+    const q=$('#qerr'); q.textContent=totalQty()===0?t('e_none'):t('e_min').replace('{n}',MIN_QTY).replace('{r}',MIN_QTY-totalQty()); q.classList.add('on');
+    $('#qrows').scrollIntoView({behavior:reduced?'auto':'smooth',block:'center'});
+    return;
+  }
+  ['fLast','fFirst','fAddr'].forEach(id=>{ const el=$('#'+id); const bad=!el.value.trim(); setBad(el,bad); if(bad) ok=false; });
+  const ph=$('#fPhone'), digits=ph.value.replace(/\D/g,''); const badPh=digits.length<8; setBad(ph,badPh); if(badPh) ok=false;
+  if(!ok){
+    const first=document.querySelector('.field[data-bad="true"] input, .field[data-bad="true"] textarea');
+    if(first){ first.scrollIntoView({behavior:reduced?'auto':'smooth',block:'center'}); first.focus({preventScroll:true}); }
+    return;
+  }
+  submitOrder();
+});
+['fLast','fFirst','fPhone','fAddr'].forEach(id=>$('#'+id).addEventListener('input',e=>setBad(e.target,false)));
+
+function orderData(){
+  return {
+    name:`${$('#fFirst').value.trim()} ${$('#fLast').value.trim()}`,
+    phone:$('#fPhone').value.trim(), address:$('#fAddr').value.trim(),
+    lines:avail.filter(p=>qty[p.id]>0).map(p=>({id:p.id,q:qty[p.id],label:pname(p)})),
+    count:totalQty(), sub:subPrice(), delivery:DELIVERY, total:totalPrice()
+  };
+}
+let lastOrder=null, sent=false;
+/* Envoie la commande au Google Sheet (via Apps Script) ; sans ORDER_ENDPOINT, simple aperçu */
+async function submitOrder(){
+  const o=orderData(); lastOrder=o; sent=false;
+  if(!ORDER_ENDPOINT){ showDone(false); return; }
+  const btn=form.querySelector('button[type=submit]'), label=btn.textContent, err=$('#qerr');
+  btn.disabled=true; btn.textContent=t('sending'); err.classList.remove('on');
+  try{
+    const payload={date:new Date().toISOString(), lang, name:o.name, phone:o.phone, address:o.address,
+      items:o.lines.map(l=>`${l.q} x ${l.label}`).join(' | '), count:o.count, subtotal:o.sub, delivery:o.delivery, total:o.total};
+    await fetch(ORDER_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    sent=true; showDone(false);
+  }catch(e){
+    err.textContent=t('e_send'); err.classList.add('on'); err.scrollIntoView({behavior:'auto',block:'center'});
+  }finally{ btn.disabled=false; btn.textContent=label; }
+}
+function showDone(fresh=true){
+  const o=(fresh||!lastOrder)?(lastOrder=orderData()):lastOrder, d=$('#done');
+  o.lines.forEach(l=>{ l.label=pname(P.find(p=>p.id===l.id)); });
+  const text=`Blush\n${o.name}\n${o.phone}\n${o.address}\n\n`+o.lines.map(l=>`${l.q} x ${l.label}`).join('\n')+`\n\n${t('subtotal')}: ${money(o.sub)}\n${t('delivery')}: ${money(o.delivery)}\n${t('total')}: ${money(o.total)}`;
+  const wa = WHATSAPP ? `<a class="btn" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">${t('wa')}</a>` : '';
+  d.innerHTML=`<div class="done"><h3>${t('done_title')}</h3><p>${t(sent?'sent_lead':'done_lead')}</p>
+    <ul>${o.lines.map(l=>`<li><span>${l.label}</span><b>× ${l.q}</b></li>`).join('')}</ul>
+    <p>${t('subtotal')} : ${money(o.sub)}<br>${t('delivery')} : ${money(o.delivery)}<br><b>${t('total')} : ${money(o.total)}</b></p>
+    <p class="who"></p>
+    ${(WHATSAPP||ORDER_ENDPOINT)?'':`<p class="note">${t('preview')}</p>`}
+    <div class="acts">${wa}<button type="button" class="btn ghost2" id="editOrder">${t('edit')}</button></div></div>`;
+  d.querySelector('.who').textContent=`${o.name}\n${o.phone}\n${o.address}`;
+  d.hidden=false; form.hidden=true;
+  d.scrollIntoView({behavior:reduced?'auto':'smooth',block:'center'});
+  $('#editOrder').onclick=()=>{ d.hidden=true; form.hidden=false; };
+}
+
+/* Bouton flottant : caché quand la commande est visible */
+const hideBtn={order:false,actions:true};
+const syncBtn=()=>$('#orderBtn').classList.toggle('hide',hideBtn.order||hideBtn.actions);
+new IntersectionObserver(es=>{ hideBtn.order=es[0].isIntersecting; syncBtn(); },{threshold:.05}).observe($('#order'));
+new IntersectionObserver(es=>{ hideBtn.actions=es[0].isIntersecting || es[0].boundingClientRect.top>0; syncBtn(); }).observe($('.actions'));
+
+let toastH;
+function toast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastH); toastH=setTimeout(()=>el.classList.remove('show'),1800); }
+
+/* ===== Langue ===== */
+function setLang(l){
+  lang=l;
+  document.documentElement.lang=l; document.documentElement.dir=l==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(n=>n.textContent=t(n.dataset.i18n));
+  document.querySelectorAll('[data-ph]').forEach(n=>n.placeholder=t(n.dataset.ph));
+  document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===l));
+  renderInfo(); renderOrder();
+  if(!$('#done').hidden) showDone(false);
+}
+document.querySelector('.lang').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) setLang(b.dataset.lang); });
+
+/* ===== Démarrage ===== */
+if(!ORDER_OPEN){ $('#order').hidden=true; $('#orderBtn').hidden=true; document.querySelector('.top nav').hidden=true; }
+setLang('en'); applyTheme(false);
+hero3d.build(); renderInfo();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
