@@ -29,7 +29,7 @@
   :root:not([data-theme="light"]){--page-bg:#15101F;--page-fg:#FBF1E6;--card:#211A31;--muted:#B2A9C2;--line:rgba(251,241,230,.2);--pop:#FF6F9E;--pop-ink:#1A1230;--btn:#FBF1E6;--btn-ink:#1A1230;--err:#FF8A80}
 }
 :root[data-theme="dark"]{--page-bg:#15101F;--page-fg:#FBF1E6;--card:#211A31;--muted:#B2A9C2;--line:rgba(251,241,230,.2);--pop:#FF6F9E;--pop-ink:#1A1230;--btn:#FBF1E6;--btn-ink:#1A1230;--err:#FF8A80}
-html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+html{scroll-padding-top:calc(100px + env(safe-area-inset-top,0px));scroll-behavior:smooth}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;background:var(--page-bg);color:var(--page-fg);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
 [lang="ar"] body,[lang="ar"] input,[lang="ar"] textarea{font-family:'Cairo',var(--sans)}
@@ -734,21 +734,19 @@ $('#heroAdd').onclick=()=>{
   setTimeout(goOrder,450);
 };
 /* Va directement au formulaire (titre « Où livrer ? » puis Nom), puis corrige si le défilement a dérivé */
-function goOrder(){
-  const el=$('#stepYou');
-  const y=()=>el.getBoundingClientRect().top+window.pageYOffset-16;
+/* hauteur de la barre fixe du haut, pour ne rien cacher dessous */
+function headH(){ const t=document.querySelector('.top'); return t? t.getBoundingClientRect().bottom+12 : 16; }
+function scrollToEl(el,extra){
+  const off=()=>headH()+(extra||0);
+  const y=()=>el.getBoundingClientRect().top+window.pageYOffset-off();
   window.scrollTo({top:y(),behavior:reduced?'auto':'smooth'});
-  setTimeout(()=>{ if(Math.abs(el.getBoundingClientRect().top-16)>24) window.scrollTo({top:y(),behavior:'auto'}); },900);
+  setTimeout(()=>{ if(Math.abs(el.getBoundingClientRect().top-off())>24) window.scrollTo({top:y(),behavior:'auto'}); },900);
 }
-$('#orderBtn').addEventListener('click',e=>{ e.preventDefault(); if(totalQty()>=MIN_QTY) goOrder(); else goProducts(); });
+function goOrder(){ scrollToEl($('#stepYou')); }
+$('#orderBtn').addEventListener('click',e=>{ e.preventDefault(); goProducts(); });
 /* Bouton « Order now » : va directement à « Choisis tes produits » */
-function goProducts(){
-  const el=$('#stepProducts');
-  const y=()=>el.getBoundingClientRect().top+window.pageYOffset-16;
-  window.scrollTo({top:y(),behavior:reduced?'auto':'smooth'});
-  setTimeout(()=>{ if(Math.abs(el.getBoundingClientRect().top-16)>24) window.scrollTo({top:y(),behavior:'auto'}); },900);
-}
-$('#orderNow').addEventListener('click',()=>{ if(totalQty()>=MIN_QTY) goOrder(); else goProducts(); });
+function goProducts(){ scrollToEl($('#order').querySelector('h2'),20); }
+$('#orderNow').addEventListener('click',goProducts);
 
 /* ===== Commande ===== */
 const qty = {}; P.forEach(p=>{ qty[p.id]=0; });
