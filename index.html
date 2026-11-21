@@ -168,6 +168,24 @@ footer b{font:800 26px var(--serif);color:var(--page-fg);letter-spacing:-.04em}
 .toast{position:fixed;z-index:70;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));translate:-50% 0;background:#1A1230;color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;text-align:center}
 .toast.show{opacity:1}
 
+
+/* ---------- Waouh : bulles, bande, reveal, compteurs, confettis ---------- */
+.fx{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.marquee{overflow:hidden;background:var(--btn);color:var(--btn-ink);padding:16px 0;direction:ltr;white-space:nowrap;border-block:2px solid var(--btn)}
+.marquee .track{display:inline-flex;animation:mq 28s linear infinite;will-change:transform}
+.marquee span{font:800 clamp(28px,6vw,64px)/1 var(--serif);letter-spacing:-.03em;text-transform:uppercase;padding-inline:.5em}
+.marquee span::after{content:"\2726";color:var(--pop);margin-inline-start:1em}
+@keyframes mq{to{transform:translateX(-50%)}}
+.stats{padding:64px 20px 24px;text-align:center}
+.stats h2{font-size:clamp(28px,5vw,52px);max-width:16em;margin:0 auto 30px;letter-spacing:-.03em}
+.stats .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:900px;margin:0 auto}
+.stats .num{background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:22px 8px}
+.stats .num b{display:block;font:800 clamp(40px,9vw,84px)/1 var(--serif);color:var(--pop);letter-spacing:-.04em}
+.stats .num span{display:block;margin-top:6px;font-size:clamp(12px,2.4vw,16px);color:var(--muted)}
+.js .rv{opacity:0;transform:translateY(46px) scale(.97);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0s)}
+.js .rv.in{opacity:1;transform:none}
+.confetti{position:fixed;inset:0;width:100%;height:100%;z-index:90;pointer-events:none}
+
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   html{scroll-behavior:auto}
@@ -177,6 +195,7 @@ footer b{font:800 26px var(--serif);color:var(--page-fg);letter-spacing:-.04em}
 <body>
 
 <section class="hero" id="top">
+  <canvas class="fx" id="fx" aria-hidden="true"></canvas>
   <div class="ghost" aria-hidden="true">Blush</div>
   <header class="top">
     <a class="brand" href="#top">Blush</a>
@@ -206,16 +225,27 @@ footer b{font:800 26px var(--serif);color:var(--page-fg);letter-spacing:-.04em}
   <div class="dots" id="dots" role="tablist"></div>
 </section>
 
+<div class="marquee" aria-hidden="true"><div class="track" id="mqTrack"></div></div>
+
+<section class="stats" id="stats">
+  <h2 class="rv" data-i18n="stats_title"></h2>
+  <div class="nums">
+    <div class="num rv" style="--d:.05s"><b data-n="5">0</b><span data-i18n="stat1"></span></div>
+    <div class="num rv" style="--d:.15s"><b data-n="2">0</b><span data-i18n="stat2"></span></div>
+    <div class="num rv" style="--d:.25s"><b data-n="12">0</b><span data-i18n="stat3"></span></div>
+  </div>
+</section>
+
 <section class="block gallery" id="gallery">
-  <h2 data-i18n="gal_title"></h2>
+  <h2 class="rv" data-i18n="gal_title"></h2>
   <div class="grid">
-    <img src="photos/action1.jpg" alt="Candy Pop" loading="lazy">
-    <img src="photos/action2.jpg" alt="Blush" loading="lazy">
+    <img class="rv" src="photos/action1.jpg" alt="Candy Pop" loading="lazy">
+    <img class="rv" style="--d:.15s" src="photos/action2.jpg" alt="Blush" loading="lazy">
   </div>
 </section>
 
 <section class="block" id="order">
-  <div class="narrow">
+  <div class="narrow rv">
     <h2 data-i18n="order_title"></h2>
     <p class="lead" data-i18n="lead"></p>
     <p class="minnote" id="minNote"></p>
@@ -247,6 +277,7 @@ footer b{font:800 26px var(--serif);color:var(--page-fg);letter-spacing:-.04em}
 
 <footer><b>Blush</b><p data-i18n="foot"></p></footer>
 
+<canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
 <a class="orderbtn" id="orderBtn" href="#order"></a>
 <div class="toast" id="toast" role="status"></div>
 
@@ -283,7 +314,7 @@ const I18N = {
     hero_sub:'For your muscles, your mind and your skin. Your body will thank you.',
     soldout:'Out of stock', soon:'Coming soon',
     pn_matcha:'Matcha Latte', pt_matcha:'Collagen +', pd_matcha:'Matcha latte with collagen +, 250 ml can.',
-    pn_mane:'Lion’s Mane', pt_mane:'Focus +', pd_mane:'Lion’s mane mushroom, focus +, 250 ml can.', gal_title:'Always in your pocket',
+    pn_mane:'Lion’s Mane', pt_mane:'Focus +', pd_mane:'Lion’s mane mushroom, focus +, 250 ml can.', gal_title:'Always in your pocket', marquee:'Blush · Creatine · Electrolytes · Zero fuss', stats_title:'Creatine, electrolytes, zero fuss.', stat1:'products', stat2:'formats: cans & sachets', stat3:'pieces minimum per order',
     pn_gummies:'Red fruit gummies', pt_gummies:'Gummies', pd_gummies:'Round gummies with creatine + electrolytes, red fruit flavor.',
     pn_candy:'Candy Pop', pt_candy:'Popping powder', pd_candy:'Creatine + electrolytes powder with popping sugar that crackles on your tongue. Red fruit.',
     pn_pool:'Poolside', pt_pool:'Sparkling can', pd_pool:'The sparkling can, creatine + electrolytes.',
@@ -308,7 +339,7 @@ const I18N = {
     hero_sub:'Pour vos muscles, votre mental et votre peau. Votre corps vous remerciera.',
     soldout:'Rupture de stock', soon:'Bientôt disponible',
     pn_matcha:'Matcha Latte', pt_matcha:'Collagène +', pd_matcha:'Matcha latte au collagène +, canette 250 ml.',
-    pn_mane:'Lion’s Mane', pt_mane:'Focus +', pd_mane:'Champignon Lion’s Mane, focus +, canette 250 ml.', gal_title:'Toujours dans votre poche',
+    pn_mane:'Lion’s Mane', pt_mane:'Focus +', pd_mane:'Champignon Lion’s Mane, focus +, canette 250 ml.', gal_title:'Toujours dans votre poche', marquee:'Blush · Créatine · Électrolytes · Zéro prise de tête', stats_title:'Créatine, électrolytes, zéro prise de tête.', stat1:'produits', stat2:'formats : canettes & sachets', stat3:'pièces minimum par commande',
     pn_gummies:'Gummies fruits rouges', pt_gummies:'Gummies', pd_gummies:'Des gummies ronds à la créatine et aux électrolytes, goût fruits rouges.',
     pn_candy:'Candy Pop', pt_candy:'Poudre pétillante', pd_candy:'Poudre créatine + électrolytes avec du sucre pétillant qui crépite sur la langue. Fruits rouges.',
     pn_pool:'Poolside', pt_pool:'Canette pétillante', pd_pool:'La canette pétillante, créatine + électrolytes.',
@@ -333,7 +364,7 @@ const I18N = {
     hero_sub:'لعضلاتك وذهنك وبشرتك. جسمك سيشكرك.',
     soldout:'نفدت الكمية', soon:'قريبًا',
     pn_matcha:'Matcha Latte', pt_matcha:'كولاجين +', pd_matcha:'ماتشا لاتيه بالكولاجين +، علبة 250 مل.',
-    pn_mane:'Lion’s Mane', pt_mane:'تركيز +', pd_mane:'فطر عرف الأسد (Lion’s Mane)، تركيز +، علبة 250 مل.', gal_title:'دائمًا في جيبك',
+    pn_mane:'Lion’s Mane', pt_mane:'تركيز +', pd_mane:'فطر عرف الأسد (Lion’s Mane)، تركيز +، علبة 250 مل.', gal_title:'دائمًا في جيبك', marquee:'Blush · كرياتين · إلكتروليت · بلا تعقيد', stats_title:'كرياتين، إلكتروليت، بلا تعقيد.', stat1:'منتجات', stat2:'أنواع: علب وأكياس', stat3:'قطعة كحد أدنى للطلب',
     pn_gummies:'غومي الفواكه الحمراء', pt_gummies:'غومي', pd_gummies:'حلوى غومي دائرية بالكرياتين والإلكتروليت بنكهة الفواكه الحمراء.',
     pn_candy:'Candy Pop', pt_candy:'بودرة فوّارة', pd_candy:'بودرة كرياتين + إلكتروليت مع سكر فوّار يطقطق على لسانك. فواكه حمراء.',
     pn_pool:'Poolside', pt_pool:'علبة فوّارة', pd_pool:'العلبة الفوّارة، كرياتين + إلكتروليت.',
@@ -358,6 +389,7 @@ const I18N = {
 /* ===== État ===== */
 const $ = s => document.querySelector(s);
 const mod = (a,n) => ((a % n) + n) % n;
+document.documentElement.classList.add('js');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let lang='en', idx=0;
 const t = k => (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k;
@@ -577,8 +609,8 @@ class Ring{
       c.holder.position.set(Math.sin(th)*this.R, fl-(1-s)*2.75, Math.cos(th)*this.R);
       c.spin+=(c.spinT-c.spin)*.08;
       const f4=f2*f2;
-      c.can.rotation.y=th+c.spin+(reduced?0:Math.sin(T*.7+i)*.09*f4)+this.smx*.35*f4;
-      c.can.rotation.x=this.smy*.07*f4;
+      c.can.rotation.y=th+c.spin+(reduced?0:Math.sin(T*.7+i)*.09*f4)+this.smx*.7*f4;
+      c.can.rotation.x=this.smy*.2*f4;
       c.can.rotation.z=reduced?0:Math.sin(T*.8+i*2)*.025;
     });
     this.renderer.render(this.scene,this.camera);
@@ -621,7 +653,8 @@ $('#prev').onclick=()=>hero3d.move(-1);
 $('#next').onclick=()=>hero3d.move(1);
 $('#heroAdd').onclick=()=>{
   const id=P[idx].id; qty[id]=Math.max(MIN_QTY,qty[id]); renderOrder(); toast(t('added'));
-  goOrder();
+  confettiAt($('#heroAdd'));
+  setTimeout(goOrder,450);
 };
 /* Va directement au formulaire (titre « Où livrer ? » puis Nom), puis corrige si le défilement a dérivé */
 function goOrder(){
@@ -671,6 +704,7 @@ $('#qrows').addEventListener('click',e=>{
     qty[id]=(tot-1<MIN_QTY && cur>0) ? 0 : Math.max(0,cur-1);
   }
   renderOrder();
+  if(d>0) confettiAt(b);
 });
 
 const form=$('#orderForm');
@@ -751,10 +785,79 @@ function setLang(l){
   document.querySelectorAll('[data-i18n]').forEach(n=>n.textContent=t(n.dataset.i18n));
   document.querySelectorAll('[data-ph]').forEach(n=>n.placeholder=t(n.dataset.ph));
   document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===l));
-  renderInfo(); renderOrder();
+  renderInfo(); renderOrder(); buildMarquee();
   if(!$('#done').hidden) showDone(false);
 }
 document.querySelector('.lang').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) setLang(b.dataset.lang); });
+
+
+/* ===== Waouh : bulles + paillettes derrière les produits ===== */
+(function(){
+  const cv=$('#fx'), ctx=cv.getContext('2d'); let W=0,H=0,vis=true,ps=[],tick=0,col1='#F06A96',col2='#6A0B2E';
+  function size(){ const r=hero.getBoundingClientRect(), d=Math.min(2,devicePixelRatio||1); W=r.width; H=r.height; cv.width=W*d; cv.height=H*d; ctx.setTransform(d,0,0,d,0,0); }
+  function mk(init){ const star=Math.random()<.35; return {x:Math.random()*W,y:init?Math.random()*H:H+20,r:star?4+Math.random()*7:5+Math.random()*16,v:.25+Math.random()*.7,ph:Math.random()*6.28,w:.4+Math.random()*.8,star,a:.25+Math.random()*.5}; }
+  function init(){ size(); ps=Array.from({length:Math.round(Math.min(46,W/22))},()=>mk(true)); }
+  function star(x,y,r,rot){ ctx.beginPath(); for(let i=0;i<8;i++){ const a=rot+i*Math.PI/4, rr=i%2?r*.28:r; ctx.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr); } ctx.closePath(); ctx.fill(); }
+  function draw(t){
+    requestAnimationFrame(draw);
+    if(!vis||document.hidden||reduced) return;
+    if(++tick%20===1){ col1=hero.style.getPropertyValue('--ac')||col1; col2=hero.style.getPropertyValue('--fg')||col2; }
+    ctx.clearRect(0,0,W,H); const T=t/1000;
+    ps.forEach((p,i)=>{
+      p.y-=p.v; p.x+=Math.sin(T*p.w+p.ph)*.35;
+      if(p.y<-30){ ps[i]=mk(false); return; }
+      if(p.star){ ctx.fillStyle=col2; ctx.globalAlpha=p.a*(.5+.5*Math.sin(T*3+p.ph)); star(p.x,p.y,p.r,T*.5+p.ph); }
+      else {
+        ctx.globalAlpha=p.a; ctx.lineWidth=1.5; ctx.strokeStyle=col2; ctx.fillStyle=col1;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.283); ctx.globalAlpha=p.a*.35; ctx.fill(); ctx.globalAlpha=p.a; ctx.stroke();
+        ctx.globalAlpha=p.a*1.4; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(p.x-p.r*.35,p.y-p.r*.35,p.r*.22,0,6.283); ctx.fill();
+      }
+    });
+    ctx.globalAlpha=1;
+  }
+  new IntersectionObserver(e=>{ vis=e[0].isIntersecting; }).observe(hero);
+  addEventListener('resize',init); init(); requestAnimationFrame(draw);
+})();
+
+/* ===== Bande de texte géante ===== */
+function buildMarquee(){
+  const w=t('marquee'), one=Array.from({length:6},()=>`<span>${w}</span>`).join('');
+  $('#mqTrack').innerHTML=one+one;
+}
+
+/* ===== Apparitions au scroll + compteurs animés ===== */
+(function(){
+  const els=document.querySelectorAll('.rv');
+  function count(el){
+    const b=el.querySelector('[data-n]'); if(!b||b.dataset.done) return; b.dataset.done=1;
+    const n=+b.dataset.n, t0=performance.now(), D=1300;
+    if(reduced){ b.textContent=n; return; }
+    (function step(now){ const k=Math.min(1,(now-t0)/D), e=1-Math.pow(1-k,3); b.textContent=Math.round(n*e); if(k<1) requestAnimationFrame(step); })(t0);
+  }
+  if(reduced||!('IntersectionObserver' in window)){ els.forEach(e=>{e.classList.add('in'); count(e);}); return; }
+  const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); count(e.target); io.unobserve(e.target); } }),{threshold:.15,rootMargin:'0px 0px -6% 0px'});
+  els.forEach(e=>io.observe(e));
+})();
+
+/* ===== Confettis (ajout au panier) ===== */
+const confettiCv=$('#confetti'), cctx=confettiCv.getContext('2d'); let conf=[], confRun=false;
+function confettiAt(el){
+  if(reduced) return;
+  const r=el.getBoundingClientRect(), x=r.left+r.width/2, y=r.top+r.height/2;
+  const d=Math.min(2,devicePixelRatio||1); confettiCv.width=innerWidth*d; confettiCv.height=innerHeight*d; cctx.setTransform(d,0,0,d,0,0);
+  const cols=[hero.style.getPropertyValue('--ac')||'#F06A96',hero.style.getPropertyValue('--fg')||'#6A0B2E','#FFC857','#FFFFFF','#7BE0C3'];
+  for(let i=0;i<70;i++){ const a=-Math.PI/2+(Math.random()-.5)*2.4, v=5+Math.random()*9;
+    conf.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:.28,s:5+Math.random()*7,rot:Math.random()*6.28,vr:(Math.random()-.5)*.5,c:cols[i%cols.length],life:0,max:70+Math.random()*40,round:Math.random()<.3}); }
+  if(!confRun){ confRun=true; requestAnimationFrame(confStep); }
+}
+function confStep(){
+  cctx.clearRect(0,0,innerWidth,innerHeight);
+  conf=conf.filter(p=>p.life<p.max);
+  conf.forEach(p=>{ p.life++; p.vy+=p.g; p.vx*=.985; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+    cctx.globalAlpha=Math.min(1,(p.max-p.life)/25); cctx.fillStyle=p.c; cctx.save(); cctx.translate(p.x,p.y); cctx.rotate(p.rot);
+    if(p.round){ cctx.beginPath(); cctx.arc(0,0,p.s/2,0,6.283); cctx.fill(); } else cctx.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6); cctx.restore(); });
+  if(conf.length) requestAnimationFrame(confStep); else { confRun=false; cctx.clearRect(0,0,innerWidth,innerHeight); }
+}
 
 /* ===== Démarrage ===== */
 if(!ORDER_OPEN){ $('#order').hidden=true; $('#orderBtn').hidden=true; document.querySelector('.top nav').hidden=true; }
