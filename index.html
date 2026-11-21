@@ -227,6 +227,16 @@ body::after{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;op
 @keyframes hwFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-.06em)}}
 .hero .sub.up{opacity:0;animation:subIn .9s .9s cubic-bezier(.2,.8,.2,1) forwards}
 @keyframes subIn{from{opacity:0;transform:translateY(14px)}to{opacity:.85;transform:none}}
+.ig{padding:36px 0 20px;text-align:center}
+.ig h2{font-size:clamp(28px,4.6vw,46px);font-weight:600;letter-spacing:-.035em;padding:0 20px}
+.ig > p{color:var(--muted);margin:10px auto 26px;max-width:28em;padding:0 20px}
+.igrow{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px max(20px,calc((100vw - 1060px)/2)) 28px;direction:ltr;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.igc{flex:0 0 min(80vw,328px);height:580px;scroll-snap-align:center;border-radius:28px;overflow:hidden;background:var(--card);border:1px solid var(--line);box-shadow:0 30px 60px -34px rgba(26,18,48,.5);position:relative}
+.igc::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,color-mix(in srgb,var(--pop) 12%,transparent) 50%,transparent 70%);background-size:220% 100%;animation:igsh 1.6s linear infinite}
+@keyframes igsh{from{background-position:120% 0}to{background-position:-120% 0}}
+.igc.ok::before{display:none}
+.igc iframe{position:relative;z-index:1;width:100%;height:100%;border:0;background:transparent;display:block}
+.igbtn{display:inline-flex;gap:6px;text-decoration:none;margin-top:4px}
 .confetti{position:fixed;inset:0;width:100%;height:100%;z-index:90;pointer-events:none}
 
 @media(prefers-reduced-motion:reduce){
@@ -288,6 +298,21 @@ body::after{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;op
     <img class="rv" src="photos/action1.jpg" alt="Candy Pop" loading="lazy">
     <img class="rv" style="--d:.15s" src="photos/action2.jpg" alt="Blush" loading="lazy">
   </div>
+</section>
+
+<section class="ig" id="instagram">
+  <h2 class="rv" data-i18n="ig_title"></h2>
+  <p class="rv" data-i18n="ig_sub" style="--d:.08s"></p>
+  <div class="igrow rv" id="igRow" style="--d:.16s">
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5gcaSMFMs/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5Pk2ZMivW/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5LITmsGhO/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5Io-_s7wG/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5FGGXMm-L/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/p/Df5CFt3jCZM/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Dfe-ZiCspuc/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+  </div>
+  <a class="btn igbtn rv" href="https://www.instagram.com/blush_tunisia/" target="_blank" rel="noopener" style="--d:.2s"><span data-i18n="ig_follow"></span> @blush_tunisia</a>
 </section>
 
 <section class="block" id="order">
@@ -360,7 +385,7 @@ const I18N = {
     hero_sub:'For your muscles, your mind and your skin. Your body will thank you.',
     soldout:'Out of stock', soon:'Coming soon',
     pn_matcha:'Matcha Latte', pt_matcha:'Collagen +', pd_matcha:'Matcha latte with collagen +, 250 ml can.',
-    pn_mane:'Lion’s Mane', pt_mane:'Focus +', pd_mane:'Lion’s mane mushroom, focus +, 250 ml can.', gal_title:'Always in your pocket', marquee:'Blush · Creatine · Electrolytes · Zero fuss', stats_title:'Creatine, electrolytes, zero fuss.', stat1:'products', stat2:'formats: cans & sachets', stat3:'pieces minimum per order',
+    pn_mane:'Lion’s Mane', pt_mane:'Focus +', pd_mane:'Lion’s mane mushroom, focus +, 250 ml can.', gal_title:'Always in your pocket', marquee:'Blush · Creatine · Electrolytes · Zero fuss', stats_title:'Creatine, electrolytes, zero fuss.', stat1:'products', stat2:'formats: cans & sachets', stat3:'pieces minimum per order', ig_title:'Blush moments', ig_sub:'Runs, breaks and good vibes, straight from our Instagram.', ig_follow:'Follow',
     pn_gummies:'Red fruit gummies', pt_gummies:'Gummies', pd_gummies:'Round gummies with creatine + electrolytes, red fruit flavor.',
     pn_candy:'Candy Pop', pt_candy:'Popping powder', pd_candy:'Creatine + electrolytes powder with popping sugar that crackles on your tongue. Red fruit.',
     pn_pool:'Poolside', pt_pool:'Sparkling can', pd_pool:'The sparkling can, creatine + electrolytes.',
@@ -385,7 +410,7 @@ const I18N = {
     hero_sub:'Pour vos muscles, votre mental et votre peau. Votre corps vous remerciera.',
     soldout:'Rupture de stock', soon:'Bientôt disponible',
     pn_matcha:'Matcha Latte', pt_matcha:'Collagène +', pd_matcha:'Matcha latte au collagène +, canette 250 ml.',
-    pn_mane:'Lion’s Mane', pt_mane:'Focus +', pd_mane:'Champignon Lion’s Mane, focus +, canette 250 ml.', gal_title:'Toujours dans votre poche', marquee:'Blush · Créatine · Électrolytes · Zéro prise de tête', stats_title:'Créatine, électrolytes, zéro prise de tête.', stat1:'produits', stat2:'formats : canettes & sachets', stat3:'pièces minimum par commande',
+    pn_mane:'Lion’s Mane', pt_mane:'Focus +', pd_mane:'Champignon Lion’s Mane, focus +, canette 250 ml.', gal_title:'Toujours dans votre poche', marquee:'Blush · Créatine · Électrolytes · Zéro prise de tête', stats_title:'Créatine, électrolytes, zéro prise de tête.', stat1:'produits', stat2:'formats : canettes & sachets', stat3:'pièces minimum par commande', ig_title:'Les moments Blush', ig_sub:'Courses, pauses et bonnes ondes, directement depuis notre Instagram.', ig_follow:'Suivre',
     pn_gummies:'Gummies fruits rouges', pt_gummies:'Gummies', pd_gummies:'Des gummies ronds à la créatine et aux électrolytes, goût fruits rouges.',
     pn_candy:'Candy Pop', pt_candy:'Poudre pétillante', pd_candy:'Poudre créatine + électrolytes avec du sucre pétillant qui crépite sur la langue. Fruits rouges.',
     pn_pool:'Poolside', pt_pool:'Canette pétillante', pd_pool:'La canette pétillante, créatine + électrolytes.',
@@ -410,7 +435,7 @@ const I18N = {
     hero_sub:'لعضلاتك وذهنك وبشرتك. جسمك سيشكرك.',
     soldout:'نفدت الكمية', soon:'قريبًا',
     pn_matcha:'Matcha Latte', pt_matcha:'كولاجين +', pd_matcha:'ماتشا لاتيه بالكولاجين +، علبة 250 مل.',
-    pn_mane:'Lion’s Mane', pt_mane:'تركيز +', pd_mane:'فطر عرف الأسد (Lion’s Mane)، تركيز +، علبة 250 مل.', gal_title:'دائمًا في جيبك', marquee:'Blush · كرياتين · إلكتروليت · بلا تعقيد', stats_title:'كرياتين، إلكتروليت، بلا تعقيد.', stat1:'منتجات', stat2:'أنواع: علب وأكياس', stat3:'قطعة كحد أدنى للطلب',
+    pn_mane:'Lion’s Mane', pt_mane:'تركيز +', pd_mane:'فطر عرف الأسد (Lion’s Mane)، تركيز +، علبة 250 مل.', gal_title:'دائمًا في جيبك', marquee:'Blush · كرياتين · إلكتروليت · بلا تعقيد', stats_title:'كرياتين، إلكتروليت، بلا تعقيد.', stat1:'منتجات', stat2:'أنواع: علب وأكياس', stat3:'قطعة كحد أدنى للطلب', ig_title:'لحظات Blush', ig_sub:'جري، استراحات وطاقة إيجابية، مباشرة من حسابنا على إنستغرام.', ig_follow:'تابعنا',
     pn_gummies:'غومي الفواكه الحمراء', pt_gummies:'غومي', pd_gummies:'حلوى غومي دائرية بالكرياتين والإلكتروليت بنكهة الفواكه الحمراء.',
     pn_candy:'Candy Pop', pt_candy:'بودرة فوّارة', pd_candy:'بودرة كرياتين + إلكتروليت مع سكر فوّار يطقطق على لسانك. فواكه حمراء.',
     pn_pool:'Poolside', pt_pool:'علبة فوّارة', pd_pool:'العلبة الفوّارة، كرياتين + إلكتروليت.',
@@ -991,6 +1016,14 @@ function confStep(){
     if(p.round){ cctx.beginPath(); cctx.arc(0,0,p.s/2,0,6.283); cctx.fill(); } else cctx.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6); cctx.restore(); });
   if(conf.length) requestAnimationFrame(confStep); else { confRun=false; cctx.clearRect(0,0,innerWidth,innerHeight); }
 }
+
+/* ===== Instagram : charge les publications seulement a l'approche de la section ===== */
+(function(){
+  const sec=document.getElementById('instagram'); if(!sec) return;
+  const load=()=>sec.querySelectorAll('iframe[data-src]').forEach(f=>{ f.src=f.dataset.src; f.removeAttribute('data-src'); f.addEventListener('load',()=>f.parentNode.classList.add('ok'),{once:true}); });
+  if(!('IntersectionObserver' in window)){ load(); return; }
+  new IntersectionObserver((e,o)=>{ if(e[0].isIntersecting){ load(); o.disconnect(); } },{rootMargin:'400px 0px'}).observe(sec);
+})();
 
 /* ===== Démarrage ===== */
 if(!ORDER_OPEN){ $('#order').hidden=true; $('#orderBtn').hidden=true; document.querySelector('.top nav').hidden=true; }
