@@ -626,7 +626,13 @@ class Ring{
     };
     addEventListener('pointerup',end); addEventListener('pointercancel',()=>end());
     el.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft') this.move(-1); if(e.key==='ArrowRight') this.move(1); });
-    if(!reduced) setInterval(()=>{ if(!this.interacted && !document.hidden && this.visible) this.target=Math.round(this.rot)+1; }, this.o.auto||4500);
+    if(!reduced) setInterval(()=>{
+      const now=performance.now();
+      // la rotation reprend toute seule 6 s apres la derniere action de l'utilisateur
+      if(this.interacted){ if(!this._seen){ this._seen=true; this.lastAct=now; } else if(!this.dragging && now-this.lastAct>6000){ this.interacted=false; this._seen=false; } }
+      else this._seen=false;
+      if(!this.interacted && !this.dragging && !document.hidden && this.visible) this.target=Math.round(this.rot)+1;
+    }, this.o.auto||4500);
   }
   tick(T){
     if(!this.dragging){
@@ -865,7 +871,7 @@ document.querySelector('.lang').addEventListener('click',e=>{ const b=e.target.c
     x.fillStyle=g; x.fillRect(0,0,64,64); return c; })();
 
   function size(){
-    const r=hero.getBoundingClientRect(), d=Math.min(2,devicePixelRatio||1); W=r.width; H=r.height;
+    const r=hero.getBoundingClientRect(), d=Math.min(small?1:1.5,devicePixelRatio||1); W=r.width; H=r.height;
     [cvB,cvG].forEach(cv=>{ cv.width=W*d; cv.height=H*d; }); cb.setTransform(d,0,0,d,0,0); cg.setTransform(d,0,0,d,0,0);
   }
   function newBubble(init){
@@ -880,7 +886,7 @@ document.querySelector('.lang').addEventListener('click',e=>{ const b=e.target.c
       col:gold?'255,214,130':'255,255,255', big:Math.random()<.16};
   }
   function init(){
-    size(); const nb=Math.round(Math.min(small?16:30,W/42)), ng=Math.round(Math.min(small?55:110,W/9));
+    size(); const nb=Math.round(Math.min(small?10:26,W/42)), ng=Math.round(Math.min(small?32:90,W/9));
     bubbles=Array.from({length:nb},()=>newBubble(true)); glit=Array.from({length:ng},newGlit);
   }
   addEventListener('pointermove',e=>{ const r=hero.getBoundingClientRect(); mx=e.clientX-r.left; my=e.clientY-r.top; },{passive:true});
