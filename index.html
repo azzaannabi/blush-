@@ -240,6 +240,19 @@ body::after{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;op
 .orderbtn{background:linear-gradient(180deg,color-mix(in srgb,var(--pop) 88%,#fff),var(--pop));box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 18px 36px -12px color-mix(in srgb,var(--pop) 80%,#000);padding:15px 30px;font-size:16px;letter-spacing:.01em;transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s}
 .orderbtn:hover{transform:translateY(-2px)}
 body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+/* Barre du haut : suit le client partout */
+.hero{overflow:hidden;overflow:clip;padding-top:calc(88px + env(safe-area-inset-top,0px))}
+.top{position:fixed;z-index:60;top:calc(10px + env(safe-area-inset-top,0px));left:50%;translate:-50% 0;width:min(1100px,calc(100% - 20px));margin:0!important;max-width:none}
+.heroTop{position:relative}
+.lead2{position:sticky;top:calc(92px + env(safe-area-inset-top,0px));z-index:6;pointer-events:none}
+.lead2 h1{margin-top:0}
+.heroTop .stage{margin-top:-130px}
+@media(max-width:640px){ .heroTop .stage{margin-top:-90px} .top{padding:7px 8px 7px 16px} .brand{font-size:30px} }
+.orderbtn{display:none!important}
+body{padding-bottom:0!important}
+.gallery{padding:34px 20px}
+.gallery .grid{max-width:520px!important;gap:10px!important}
+.gallery img{aspect-ratio:4/5!important;border-radius:22px!important}
 .confetti{position:fixed;inset:0;width:100%;height:100%;z-index:90;pointer-events:none}
 
 @media(prefers-reduced-motion:reduce){
@@ -266,10 +279,13 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     </div>
   </header>
 
-  <h1 data-i18n="hero_title"></h1>
-  <p class="sub" data-i18n="hero_sub"></p>
-
-  <div class="stage" id="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Blush"></div>
+  <div class="heroTop">
+    <div class="lead2">
+      <h1 data-i18n="hero_title"></h1>
+      <p class="sub" data-i18n="hero_sub"></p>
+    </div>
+    <div class="stage" id="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Blush"></div>
+  </div>
 
   <div class="info" id="info" aria-live="polite">
     <span class="pill" id="pill"></span>
@@ -283,8 +299,6 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   </div>
   <div class="dots" id="dots" role="tablist"></div>
 </section>
-
-<div class="marquee" aria-hidden="true"><div class="track" id="mqTrack"></div></div>
 
 <section class="stats" id="stats">
   <h2 class="rv" data-i18n="stats_title"></h2>
@@ -751,7 +765,7 @@ function goProducts(){
   window.scrollTo({top:y(),behavior:reduced?'auto':'smooth'});
   setTimeout(()=>{ if(Math.abs(el.getBoundingClientRect().top-16)>24) window.scrollTo({top:y(),behavior:'auto'}); },900);
 }
-$('#orderNow').addEventListener('click',goProducts);
+$('#orderNow').addEventListener('click',()=>{ if(totalQty()>=MIN_QTY) goOrder(); else goProducts(); });
 
 /* ===== Commande ===== */
 const qty = {}; P.forEach(p=>{ qty[p.id]=0; });
@@ -772,6 +786,7 @@ function renderOrder(){
   $('#sumDel').textContent=money(DELIVERY); $('#sumTotal').textContent=money(totalPrice());
   $('#qerr').classList.remove('on');
   $('#orderBtn').textContent=t('order_now')+(totalQty()?` · ${totalQty()}/${MIN_QTY}`:'');
+  $('#orderNow').textContent=t('order_now')+(totalQty()?` · ${totalQty()}/${MIN_QTY}`:'');
 }
 $('#qrows').addEventListener('click',e=>{
   const b=e.target.closest('[data-q]'); if(!b) return;
@@ -860,7 +875,7 @@ function setLang(l){
   document.querySelectorAll('[data-i18n]').forEach(n=>n.textContent=t(n.dataset.i18n));
   document.querySelectorAll('[data-ph]').forEach(n=>n.placeholder=t(n.dataset.ph));
   document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===l));
-  renderInfo(); renderOrder(); buildMarquee(); heroWords();
+  renderInfo(); renderOrder(); heroWords();
   if(!$('#done').hidden) showDone(false);
 }
 document.querySelector('.lang').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) setLang(b.dataset.lang); });
@@ -973,12 +988,6 @@ function heroWords(){
   const h=document.querySelector('.hero h1'), sub=document.querySelector('.hero .sub'); if(!h) return;
   h.innerHTML=t('hero_title').split(' ').map((w,i)=>`<span class="hw" style="--i:${i}">${w}</span>`).join(' ');
   sub.classList.remove('up'); void sub.offsetWidth; sub.classList.add('up');
-}
-
-/* ===== Bande de texte géante ===== */
-function buildMarquee(){
-  const w=t('marquee'), one=Array.from({length:6},()=>`<span>${w}</span>`).join('');
-  $('#mqTrack').innerHTML=one+one;
 }
 
 /* ===== Apparitions au scroll + compteurs animés ===== */
