@@ -220,9 +220,18 @@ body::after{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;op
 .step{letter-spacing:-.02em}
 .js .rv{opacity:0;transform:translateY(28px);filter:blur(6px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1),filter 1s;transition-delay:var(--d,0s)}
 .js .rv.in{opacity:1;transform:none;filter:none}
+.hw{display:inline-block;opacity:0;transform:translateY(.55em) rotate(2.5deg);filter:blur(8px);
+  animation:hwIn .95s cubic-bezier(.2,.8,.2,1) forwards,hwFloat 5s ease-in-out infinite;
+  animation-delay:calc(var(--i)*.1s + .1s),calc(1.4s + var(--i)*.28s)}
+@keyframes hwIn{to{opacity:1;transform:none;filter:none}}
+@keyframes hwFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-.06em)}}
+.hero .sub.up{opacity:0;animation:subIn .9s .9s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes subIn{from{opacity:0;transform:translateY(14px)}to{opacity:.85;transform:none}}
 .confetti{position:fixed;inset:0;width:100%;height:100%;z-index:90;pointer-events:none}
 
 @media(prefers-reduced-motion:reduce){
+  .hw{opacity:1!important;transform:none!important;filter:none!important}
+  .hero .sub.up{opacity:.85!important}
   *,*::before,*::after{animation:none!important;transition:none!important}
   html{scroll-behavior:auto}
 }
@@ -828,7 +837,7 @@ function setLang(l){
   document.querySelectorAll('[data-i18n]').forEach(n=>n.textContent=t(n.dataset.i18n));
   document.querySelectorAll('[data-ph]').forEach(n=>n.placeholder=t(n.dataset.ph));
   document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===l));
-  renderInfo(); renderOrder(); buildMarquee();
+  renderInfo(); renderOrder(); buildMarquee(); heroWords();
   if(!$('#done').hidden) showDone(false);
 }
 document.querySelector('.lang').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) setLang(b.dataset.lang); });
@@ -886,7 +895,7 @@ document.querySelector('.lang').addEventListener('click',e=>{ const b=e.target.c
       col:gold?'255,214,130':'255,255,255', big:Math.random()<.16};
   }
   function init(){
-    size(); const nb=Math.round(Math.min(small?10:26,W/42)), ng=Math.round(Math.min(small?32:90,W/9));
+    size(); const nb=0, ng=Math.round(Math.min(small?32:90,W/9));
     bubbles=Array.from({length:nb},()=>newBubble(true)); glit=Array.from({length:ng},newGlit);
   }
   addEventListener('pointermove',e=>{ const r=hero.getBoundingClientRect(); mx=e.clientX-r.left; my=e.clientY-r.top; },{passive:true});
@@ -935,6 +944,13 @@ document.querySelector('.lang').addEventListener('click',e=>{ const b=e.target.c
   let rz; addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(init,150); });
   init(); requestAnimationFrame(frame);
 })();
+
+/* ===== Titre d'accueil anime (mot par mot) ===== */
+function heroWords(){
+  const h=document.querySelector('.hero h1'), sub=document.querySelector('.hero .sub'); if(!h) return;
+  h.innerHTML=t('hero_title').split(' ').map((w,i)=>`<span class="hw" style="--i:${i}">${w}</span>`).join(' ');
+  sub.classList.remove('up'); void sub.offsetWidth; sub.classList.add('up');
+}
 
 /* ===== Bande de texte géante ===== */
 function buildMarquee(){
