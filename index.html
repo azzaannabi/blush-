@@ -237,6 +237,9 @@ body::after{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;op
 .igc.ok::before{display:none}
 .igc iframe{position:relative;z-index:1;width:100%;height:100%;border:0;background:transparent;display:block}
 .igbtn{display:inline-flex;gap:6px;text-decoration:none;margin-top:4px}
+.orderbtn{background:linear-gradient(180deg,color-mix(in srgb,var(--pop) 88%,#fff),var(--pop));box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 18px 36px -12px color-mix(in srgb,var(--pop) 80%,#000);padding:15px 30px;font-size:16px;letter-spacing:.01em;transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s}
+.orderbtn:hover{transform:translateY(-2px)}
+body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .confetti{position:fixed;inset:0;width:100%;height:100%;z-index:90;pointer-events:none}
 
 @media(prefers-reduced-motion:reduce){
@@ -300,21 +303,6 @@ body::after{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;op
   </div>
 </section>
 
-<section class="ig" id="instagram">
-  <h2 class="rv" data-i18n="ig_title"></h2>
-  <p class="rv" data-i18n="ig_sub" style="--d:.08s"></p>
-  <div class="igrow rv" id="igRow" style="--d:.16s">
-      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5gcaSMFMs/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5Pk2ZMivW/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5LITmsGhO/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5Io-_s7wG/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5FGGXMm-L/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-      <div class="igc"><iframe data-src="https://www.instagram.com/p/Df5CFt3jCZM/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Dfe-ZiCspuc/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-  </div>
-  <a class="btn igbtn rv" href="https://www.instagram.com/blush_tunisia/" target="_blank" rel="noopener" style="--d:.2s"><span data-i18n="ig_follow"></span> @blush_tunisia</a>
-</section>
-
 <section class="block" id="order">
   <div class="narrow rv">
     <h2 data-i18n="order_title"></h2>
@@ -344,6 +332,21 @@ body::after{content:"";position:fixed;inset:0;z-index:100;pointer-events:none;op
     </form>
     <div id="done" hidden></div>
   </div>
+</section>
+
+<section class="ig" id="instagram">
+  <h2 class="rv" data-i18n="ig_title"></h2>
+  <p class="rv" data-i18n="ig_sub" style="--d:.08s"></p>
+  <div class="igrow rv" id="igRow" style="--d:.16s">
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5gcaSMFMs/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5Pk2ZMivW/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5LITmsGhO/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5Io-_s7wG/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Df5FGGXMm-L/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/p/Df5CFt3jCZM/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div class="igc"><iframe data-src="https://www.instagram.com/reel/Dfe-ZiCspuc/embed" title="Instagram Blush" loading="lazy" scrolling="no" allowtransparency="true" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+  </div>
+  <a class="btn igbtn rv" href="https://www.instagram.com/blush_tunisia/" target="_blank" rel="noopener" style="--d:.2s"><span data-i18n="ig_follow"></span> @blush_tunisia</a>
 </section>
 
 <footer><b>Blush</b><p data-i18n="foot"></p></footer>
@@ -740,7 +743,7 @@ function goOrder(){
   window.scrollTo({top:y(),behavior:reduced?'auto':'smooth'});
   setTimeout(()=>{ if(Math.abs(el.getBoundingClientRect().top-16)>24) window.scrollTo({top:y(),behavior:'auto'}); },900);
 }
-$('#orderBtn').addEventListener('click',e=>{ e.preventDefault(); goOrder(); });
+$('#orderBtn').addEventListener('click',e=>{ e.preventDefault(); if(totalQty()>=MIN_QTY) goOrder(); else goProducts(); });
 /* Bouton « Order now » : va directement à « Choisis tes produits » */
 function goProducts(){
   const el=$('#stepProducts');
@@ -768,7 +771,7 @@ function renderOrder(){
   $('#sumCans').textContent=`${totalQty()} / ${MIN_QTY}`; $('#sumSub').textContent=money(subPrice());
   $('#sumDel').textContent=money(DELIVERY); $('#sumTotal').textContent=money(totalPrice());
   $('#qerr').classList.remove('on');
-  $('#orderBtn').textContent=t('order_cta')+(totalQty()?` · ${totalQty()}/${MIN_QTY}`:'');
+  $('#orderBtn').textContent=t('order_now')+(totalQty()?` · ${totalQty()}/${MIN_QTY}`:'');
 }
 $('#qrows').addEventListener('click',e=>{
   const b=e.target.closest('[data-q]'); if(!b) return;
@@ -846,12 +849,7 @@ function showDone(fresh=true){
   $('#editOrder').onclick=()=>{ d.hidden=true; form.hidden=false; };
 }
 
-/* Bouton flottant : caché quand la commande est visible */
-const hideBtn={order:false,actions:true};
-const syncBtn=()=>$('#orderBtn').classList.toggle('hide',hideBtn.order||hideBtn.actions);
-new IntersectionObserver(es=>{ hideBtn.order=es[0].isIntersecting; syncBtn(); },{threshold:.05}).observe($('#order'));
-new IntersectionObserver(es=>{ hideBtn.actions=es[0].isIntersecting || es[0].boundingClientRect.top>0; syncBtn(); }).observe($('.actions'));
-
+/* Bouton flottant « Order now » : toujours visible, suit le client partout */
 let toastH;
 function toast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastH); toastH=setTimeout(()=>el.classList.remove('show'),1800); }
 
