@@ -139,6 +139,12 @@ form{display:grid;gap:14px}
 .field[data-bad="true"] input,.field[data-bad="true"] textarea{border-color:var(--err)}
 .err{display:none;color:var(--err);font-size:13px;margin-top:5px;font-weight:600}
 .field[data-bad="true"] .err,.err.on{display:block}
+.geo-btn{margin-top:8px;display:inline-flex;align-items:center;gap:6px;background:transparent;border:1.5px solid var(--line);color:var(--page-fg);border-radius:99px;padding:9px 16px;font-size:14px;font-weight:600;cursor:pointer;transition:border-color .2s}
+.geo-btn:hover{border-color:var(--pop)}
+.geo-btn:disabled{opacity:.6;cursor:wait}
+.geo-btn[hidden]{display:none}
+.geo-msg{font-size:13px;color:var(--muted);margin-top:6px}
+.geo-msg.bad{color:var(--err)}
 
 .summary{margin-top:8px;background:var(--pop);color:var(--pop-ink);border-radius:22px;padding:18px 20px;display:grid;gap:6px}
 .summary .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
@@ -317,7 +323,9 @@ body{padding-bottom:0!important}
         <div class="field"><label for="fFirst" data-i18n="first"></label><input id="fFirst" name="first" autocomplete="given-name" required><p class="err" data-i18n="e_req"></p></div>
       </div>
       <div class="field"><label for="fPhone" data-i18n="phone"></label><input id="fPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" required><p class="err" data-i18n="e_phone"></p></div>
-      <div class="field"><label for="fAddr" data-i18n="address"></label><textarea id="fAddr" name="address" autocomplete="street-address" data-ph="ph_address" required></textarea><p class="err" data-i18n="e_req"></p></div>
+      <div class="field"><label for="fAddr" data-i18n="address"></label><textarea id="fAddr" name="address" autocomplete="street-address" data-ph="ph_address" required></textarea><p class="err" data-i18n="e_req"></p>
+        <button type="button" class="geo-btn" id="geoBtn" data-i18n="geo_btn"></button>
+        <p class="geo-msg" id="geoMsg" aria-live="polite"></p></div>
 
       <div class="summary" aria-live="polite">
         <div class="row"><span data-i18n="items"></span><b id="sumCans">0</b></div>
@@ -399,6 +407,7 @@ const I18N = {
     cans:'cans',can:'can',pack:'Pack',save:'Save {x}',
     surprise:'Surprise me',clear:'Clear',of:'of',
     last:'Last name',first:'First name',phone:'Phone number',address:'Address',ph_address:'Street, number, city',
+    geo_btn:'📍 Use my location (optional)',geo_wait:'Locating…',geo_ok:'Location added ✅ Add a landmark (pharmacy, café…) if you can.',geo_denied:'Location access denied: type your address instead.',geo_fail:'Location unavailable: type your address instead.',
     cans_total:'Cans',total:'Total',confirm:'Confirm my order',
     e_req:'This field is required.',e_phone:'Enter a valid phone number.',
     e_design:'Pick a design for your pack.',e_mix:'Your pack needs exactly {n} cans. {r} to go.',
@@ -424,6 +433,7 @@ const I18N = {
     cans:'canettes',can:'canette',pack:'Pack',save:'{x} d’économie',
     surprise:'Surprends-moi',clear:'Effacer',of:'sur',
     last:'Nom',first:'Prénom',phone:'Numéro de téléphone',address:'Adresse',ph_address:'Rue, numéro, ville',
+    geo_btn:'📍 Utiliser ma position (facultatif)',geo_wait:'Localisation en cours…',geo_ok:'Position ajoutée ✅ Ajoute un repère (pharmacie, café…) si tu peux.',geo_denied:'Accès à la position refusé : écris ton adresse à la main.',geo_fail:'Position indisponible : écris ton adresse à la main.',
     cans_total:'Canettes',total:'Total',confirm:'Confirmer ma commande',
     e_req:'Ce champ est obligatoire.',e_phone:'Entre un numéro de téléphone valide.',
     e_design:'Choisis un design pour ton pack.',e_mix:'Ton pack doit contenir exactement {n} canettes. Il en manque {r}.',
@@ -449,6 +459,7 @@ const I18N = {
     cans:'علب',can:'علبة',pack:'الباقة',save:'وفّر {x}',
     surprise:'فاجئني',clear:'مسح',of:'من',
     last:'اللقب',first:'الاسم',phone:'رقم الهاتف',address:'العنوان',ph_address:'الشارع، الرقم، المدينة',
+    geo_btn:'📍 استخدم موقعي (اختياري)',geo_wait:'جارٍ تحديد الموقع…',geo_ok:'تمت إضافة موقعك ✅ أضف معلمًا قريبًا (صيدلية، مقهى…) إن أمكن.',geo_denied:'تم رفض الوصول إلى الموقع: اكتب عنوانك يدويًا.',geo_fail:'الموقع غير متاح: اكتب عنوانك يدويًا.',
     cans_total:'العلب',total:'المجموع',confirm:'تأكيد طلبي',
     e_req:'هذا الحقل مطلوب.',e_phone:'أدخل رقم هاتف صالحًا.',
     e_design:'اختر تصميمًا لباقتك.',e_mix:'يجب أن تحتوي باقتك على {n} علبة بالضبط. ينقصك {r}.',
@@ -803,6 +814,26 @@ form.addEventListener('submit',e=>{
   submitOrder();
 });
 ['fLast','fFirst','fPhone','fAddr'].forEach(id=>$('#'+id).addEventListener('input',e=>setBad(e.target,false)));
+
+/* Bouton facultatif « Utiliser ma position » : ajoute un lien Google Maps à l'adresse */
+(function(){
+  const btn=$('#geoBtn'), msg=$('#geoMsg'), addr=$('#fAddr');
+  if(!('geolocation' in navigator)){ btn.hidden=true; return; }
+  const say=(key,bad)=>{
+    if(key){ msg.dataset.i18n=key; msg.textContent=t(key); } else { delete msg.dataset.i18n; msg.textContent=''; }
+    msg.classList.toggle('bad',!!bad);
+  };
+  btn.addEventListener('click',()=>{
+    btn.disabled=true; say('geo_wait');
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const link='📍 https://www.google.com/maps?q='+pos.coords.latitude.toFixed(6)+','+pos.coords.longitude.toFixed(6);
+      addr.value=addr.value.split('\n').filter(l=>!l.startsWith('📍')).concat(link).join('\n').trim();
+      setBad(addr,false); btn.disabled=false; say('geo_ok');
+    },err=>{
+      btn.disabled=false; say(err&&err.code===1?'geo_denied':'geo_fail',true);
+    },{enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+  });
+})();
 
 function orderData(){
   return {
