@@ -151,6 +151,8 @@ form{display:grid;gap:14px}
 .summary .big{font:800 30px var(--serif)}
 [lang="ar"] .summary .big{font-family:'Cairo',sans-serif}
 .go{width:100%;margin-top:6px;padding:17px;font-size:17px;background:var(--btn);color:var(--btn-ink)}
+.go{opacity:.5;filter:saturate(.6);transition:opacity .25s,filter .25s,transform .15s,box-shadow .25s}
+.go.ready{opacity:1;filter:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--btn) 30%,transparent),0 12px 30px -8px var(--btn)}
 
 .done{background:var(--card);border:1.5px solid var(--pop);border-radius:24px;padding:22px}
 .done h3{font-size:26px;margin-bottom:10px}
@@ -819,6 +821,14 @@ form.addEventListener('submit',e=>{
   submitOrder();
 });
 ['fLast','fFirst','fPhone','fAddr'].forEach(id=>$('#'+id).addEventListener('input',e=>setBad(e.target,false)));
+/* Bouton « Confirmer » : s'allume quand tout est rempli */
+function updateReady(){
+  const ok=totalQty()>=MIN_QTY && ['fLast','fFirst','fAddr'].every(id=>$('#'+id).value.trim()) && $('#fPhone').value.replace(/\D/g,'').length>=8;
+  const b=form.querySelector('button[type=submit]'); if(b) b.classList.toggle('ready',ok);
+}
+['fLast','fFirst','fPhone','fAddr'].forEach(id=>{ $('#'+id).addEventListener('input',updateReady); $('#'+id).addEventListener('change',updateReady); });
+const _render=renderOrder; renderOrder=function(){ _render.apply(this,arguments); updateReady(); };
+updateReady();
 
 /* Bouton facultatif « Utiliser ma position » : ajoute un lien Google Maps à l'adresse */
 (function(){
