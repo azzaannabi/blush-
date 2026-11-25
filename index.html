@@ -369,6 +369,11 @@ const PRICES = {gummies:2.5, candy:3, pool:6, matcha:7.5, mane:7.5};  // prix un
 const CUR = {en:'DT', fr:'DT', ar:'د.ت'};
 const ORDER_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyOUhSnhfyTzetxUEFAoG2M5C9Lbihc9r5G40S_XAJh5x13uf1UC8vgvS88vdj-V1Q/exec';             // URL du script Google Apps Script (envoie chaque commande dans le Google Sheet)
 const WHATSAPP = '';                     // ex. '21612345678' : active l'envoi de la commande par WhatsApp
+/* Suivi influenceurs : le lien ?ref=nom est memorise 30 jours, puis envoye avec la commande */
+try{ const _r=new URLSearchParams(location.search).get('ref');
+  if(_r){ const _c=_r.toLowerCase().trim().replace(/[^a-z0-9_.-]/g,'').slice(0,40);
+    if(_c) localStorage.setItem('ref',JSON.stringify({c:_c,t:Date.now()})); } }catch(e){}
+function getRef(){ try{ const r=JSON.parse(localStorage.getItem('ref')||'null'); if(r&&r.c&&Date.now()-r.t<30*864e5) return r.c; }catch(e){} return ''; }
 
 /* ===== Les produits =====
    kind 'can' = canette 3D ; kind 'sachet' = sachet carré 3D.  soldout:true = tampon « rupture de stock » */
@@ -852,7 +857,7 @@ async function submitOrder(){
   btn.disabled=true; btn.textContent=t('sending'); err.classList.remove('on');
   try{
     const payload={date:new Date().toISOString(), lang, name:o.name, phone:o.phone, address:o.address,
-      items:o.lines.map(l=>`${l.q} x ${l.label}`).join(' | '), count:o.count, subtotal:o.sub, delivery:o.delivery, total:o.total};
+      ref:getRef(), items:o.lines.map(l=>`${l.q} x ${l.label}`).join(' | '), count:o.count, subtotal:o.sub, delivery:o.delivery, total:o.total};
     await fetch(ORDER_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
     sent=true; showDone(false);
   }catch(e){
