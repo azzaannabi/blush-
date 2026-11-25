@@ -151,8 +151,9 @@ form{display:grid;gap:14px}
 .summary .big{font:800 30px var(--serif)}
 [lang="ar"] .summary .big{font-family:'Cairo',sans-serif}
 .go{width:100%;margin-top:6px;padding:17px;font-size:17px;background:var(--btn);color:var(--btn-ink)}
-.go{opacity:.5;filter:saturate(.6);transition:opacity .25s,filter .25s,transform .15s,box-shadow .25s}
-.go.ready{opacity:1;filter:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--btn) 30%,transparent),0 12px 30px -8px var(--btn)}
+.btn.go{background:color-mix(in srgb,var(--muted) 28%,var(--card));color:var(--muted);box-shadow:none;opacity:1;filter:none;transition:background .25s,color .25s,box-shadow .25s,transform .15s}
+.btn.go::after{display:none}
+.btn.go.ready{background:linear-gradient(180deg,color-mix(in srgb,var(--pop) 86%,#fff),var(--pop));color:var(--pop-ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--pop) 30%,transparent),0 14px 34px -8px var(--pop)}
 
 .done{background:var(--card);border:1.5px solid var(--pop);border-radius:24px;padding:22px}
 .done h3{font-size:26px;margin-bottom:10px}
