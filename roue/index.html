@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E0457B">
+<title>Blush – Roue de la fortune</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=DM+Sans:wght@400;500;600;700&family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  /* Charte Blush : mêmes polices, couleurs et boutons que le site */
+  @property --bg{syntax:'<color>';inherits:true;initial-value:#FAC3D2}
+  @property --fg{syntax:'<color>';inherits:true;initial-value:#6A0B2E}
+  @property --ac{syntax:'<color>';inherits:true;initial-value:#F06A96}
+  :root{
+    --page-bg:#FFF7EF; --page-fg:#1A1230; --pop:#E0457B;
+    --serif:'Fraunces',Georgia,serif; --sans:'DM Sans',system-ui,sans-serif;
+    --bg:#FAC3D2; --fg:#6A0B2E; --ac:#F06A96;
+  }
+  *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{
+    min-height:100dvh; position:relative; overflow-x:hidden;
+    background:var(--bg); color:var(--fg); font-family:var(--sans); line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    transition:--bg .8s ease,--fg .8s ease,--ac .8s ease;
+    display:flex; flex-direction:column; align-items:center;
+    padding:max(14px,env(safe-area-inset-top)) 20px max(28px,env(safe-area-inset-bottom));
+  }
+  [lang="ar"] body{font-family:'Cairo',var(--sans)}
+  [lang="ar"] h1,[lang="ar"] .brand,[lang="ar"] .prize,[lang="ar"] h2{font-family:'Cairo',sans-serif;letter-spacing:0}
+  body::before{
+    content:"";position:absolute;left:50%;top:52%;width:min(900px,160vw);aspect-ratio:1;translate:-50% -50%;
+    background:radial-gradient(closest-side,var(--ac),transparent);opacity:.85;pointer-events:none;
+  }
+  .ghost{
+    position:absolute;left:50%;top:50%;translate:-50% -50%;white-space:nowrap;
+    font:800 min(46vw,430px)/1 var(--serif);letter-spacing:-.06em;color:var(--fg);opacity:.1;
+    pointer-events:none;user-select:none;
+  }
+  .top{position:relative;z-index:5;width:100%;max-width:460px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0}
+  .brand{font:800 38px/1 var(--serif);letter-spacing:-.045em;color:inherit}
+  .lang{display:flex;gap:4px;padding:3px;border-radius:99px;background:color-mix(in srgb,var(--fg) 12%,transparent);direction:ltr}
+  .lang button{border:0;background:none;padding:6px 12px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans','Cairo',sans-serif;color:inherit}
+  .lang button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+  h1{position:relative;z-index:2;font:800 clamp(32px,9vw,46px)/1.08 var(--serif);letter-spacing:-.035em;margin:14px 0 0;text-align:center}
+  .sub{position:relative;z-index:2;margin:8px 0 22px;text-align:center;font-size:16px;opacity:.85}
+
+  .stage{position:relative;z-index:3;width:min(84vw,380px);aspect-ratio:1;margin-top:12px;direction:ltr}
+  .ring{position:absolute;inset:-9px;border-radius:50%;background:var(--fg);box-shadow:0 14px 34px color-mix(in srgb,var(--fg) 28%,transparent)}
+  #wheel{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;transition:transform 5.2s cubic-bezier(.12,.62,.08,1)}
+  .pointer{position:absolute;top:-26px;left:50%;transform:translateX(-50%);z-index:4;width:0;height:0;
+    border-left:15px solid transparent;border-right:15px solid transparent;border-top:32px solid var(--fg);
+    filter:drop-shadow(0 2px 0 var(--bg))}
+  .hub{position:absolute;z-index:3;left:50%;top:50%;width:19%;aspect-ratio:1;transform:translate(-50%,-50%);
+    border-radius:50%;background:var(--page-bg);border:5px solid var(--fg);display:grid;place-items:center;
+    font:800 clamp(12px,3.6vw,16px)/1 var(--serif);letter-spacing:-.045em;color:var(--fg)}
+
+  .btn{position:relative;z-index:6;border:0;border-radius:99px;padding:15px 40px;font:700 18px var(--sans);
+    background:var(--fg);color:var(--bg);cursor:pointer;transition:transform .15s;
+    box-shadow:0 6px 16px color-mix(in srgb,var(--fg) 25%,transparent)}
+  [lang="ar"] .btn{font-family:'Cairo',sans-serif}
+  .btn:active{transform:scale(.97)}
+  .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  #spin{margin-top:34px}
+  .note{position:relative;z-index:2;margin-top:16px;font-size:13px;opacity:.75;text-align:center;max-width:320px}
+
+  .overlay{position:fixed;inset:0;background:rgba(26,18,48,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+  .overlay.show{display:flex}
+  .card{background:#fff;color:var(--page-fg);border-radius:26px;padding:28px 22px 24px;width:100%;max-width:360px;text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.3);animation:pop .35s ease-out}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  .card .pill{display:inline-block;padding:4px 14px;border:1.5px solid var(--pop);color:var(--pop);border-radius:99px;font-size:13px;font-weight:700;letter-spacing:.04em}
+  .card h2{font:800 34px/1.08 var(--serif);letter-spacing:-.03em;margin:12px 0 2px;color:var(--pop)}
+  .card .prize{font:800 24px/1.15 var(--serif);letter-spacing:-.02em;margin:6px 0 16px}
+  .code{display:inline-block;border:1.5px dashed var(--pop);border-radius:14px;padding:10px 20px;background:#FFF7EF;
+    font:700 24px var(--sans);letter-spacing:3px;color:var(--page-fg)}
+  .card p{margin:12px 0 0;font-size:14px;color:#6B6378}
+  .card .btn{display:inline-block;margin-top:16px;padding:13px 28px;font-size:16px;text-decoration:none;background:var(--page-fg);color:#FFF7EF;box-shadow:none}
+  .card .btn.ghost2{background:none;color:var(--page-fg);border:1.5px solid rgba(26,18,48,.25);margin-top:10px}
+  .conf{position:fixed;top:-20px;width:10px;height:14px;z-index:11;border-radius:2px;animation:fall linear forwards;pointer-events:none}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+</style>
+</head>
+<body>
+<div class="ghost">Blush</div>
+<div class="top">
+  <div class="brand">Blush</div>
+  <div class="lang" role="group" aria-label="Langue">
+    <button id="en" aria-pressed="false">EN</button>
+    <button id="fr" aria-pressed="true">FR</button>
+    <button id="ar" aria-pressed="false">عربي</button>
+  </div>
+</div>
+<h1 id="t1"></h1>
+<p class="sub" id="t2"></p>
+
+<div class="stage">
+  <div class="ring"></div>
+  <div class="pointer"></div>
+  <canvas id="wheel" width="900" height="900"></canvas>
+  <div class="hub">Blush</div>
+</div>
+
+<button class="btn" id="spin"></button>
+<div class="note" id="note"></div>
+
+<div class="overlay" id="ov"><div class="card" id="card"></div></div>
+
+<script>
+/* ============ À MODIFIER : les lots de la roue ============
+   w   = poids (chance relative) : plus c'est petit, plus c'est rare
+   win = false → segment « perdu »
+   Couleurs = palettes des produits du site (fond, texte, accent) */
+const PAL = {
+  pink:  {bg:"#FAC3D2", fg:"#6A0B2E", ac:"#F06A96"},
+  yellow:{bg:"#FCE3A8", fg:"#7A1030", ac:"#F7C23C"},
+  green: {bg:"#D3E4B8", fg:"#2F4A14", ac:"#8DB84F"},
+  blue:  {bg:"#C3DBF1", fg:"#4A3320", ac:"#86B6E2"},
+};
+const PRIZES = [
+  { fr:"Gummies\nofferts",      en:"Free\ngummies",     ar:"غومي\nمجاني",         w:6,  win:true,  code:"GUM",  pal:"pink",   strong:true  },
+  { fr:"Pas de\nchance",        en:"No\nluck",          ar:"حظ\nأوفر",            w:14, win:false, pal:"yellow", strong:false },
+  { fr:"-10%\ncommande",        en:"-10%\non order",    ar:"خصم\n10%",            w:16, win:true,  code:"B10",  pal:"green",  strong:true  },
+  { fr:"Candy Pop\noffert",     en:"Free\nCandy Pop",   ar:"كاندي بوب\nمجاني",    w:6,  win:true,  code:"CPO",  pal:"blue",   strong:false },
+  { fr:"Réessaie",              en:"Try\nagain",        ar:"جرّب\nمجدداً",        w:14, win:false, pal:"yellow", strong:true  },
+  { fr:"Livraison\nofferte",    en:"Free\ndelivery",    ar:"توصيل\nمجاني",        w:10, win:true,  code:"LIV",  pal:"pink",   strong:false },
+  { fr:"-20%\ncommande",        en:"-20%\non order",    ar:"خصم\n20%",            w:5,  win:true,  code:"B20",  pal:"blue",   strong:true  },
+  { fr:"Cadeau\nsurprise",      en:"Surprise\ngift",    ar:"هدية\nمفاجأة",        w:4,  win:true,  code:"SUR",  pal:"green",  strong:false },
+];
+const SITE_URL = "https://blush-tunisia.site";
+const PROMO_SALT = "blush26", PROMO_A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", PROMO_E0 = Date.UTC(2026,0,1)/864e5, VALID_DAYS = 7;
+const TEST = location.hash === "#test";     // ajouter #test à l'adresse pour rejouer sans limite
+const ONE_SPIN_PER_PHONE = !TEST;
+/* ========================================================= */
+
+const T = {
+  fr:{t1:"Tourne la roue !", t2:"Gagne des produits Blush", go:"Tourner", spinning:"…", again:"Voir mon cadeau",
+      note:"1 tour par personne. Utilise ton code sur le site ou montre-le à l'équipe Blush.",
+      pill:"Ton cadeau", win:"Bravo !", lose:"Oups…", loseTxt:"Pas de cadeau cette fois. Merci d'avoir joué !",
+      showCode:"Utilise ce code dans ta commande ou montre-le à l'équipe Blush", close:"Fermer", order:"Commander sur Blush", date:"Valable jusqu'au"},
+  en:{t1:"Spin the wheel!", t2:"Win Blush products", go:"Spin", spinning:"…", again:"See my gift",
+      note:"1 spin per person. Use your code on the site or show it to the Blush team.",
+      pill:"Your gift", win:"Congrats!", lose:"Oops…", loseTxt:"No gift this time. Thanks for playing!",
+      showCode:"Use this code in your order or show it to the Blush team", close:"Close", order:"Order on Blush", date:"Valid until"},
+  ar:{t1:"دوّر العجلة !", t2:"اربح منتجات Blush", go:"دوّر", spinning:"…", again:"شاهد هديتي",
+      note:"دورة واحدة لكل شخص. استعمل الكود في الموقع أو أظهره لفريق Blush.",
+      pill:"هديتك", win:"مبروك !", lose:"للأسف…", loseTxt:"لا توجد هدية هذه المرة. شكراً على اللعب !",
+      showCode:"استعمل هذا الكود في طلبك أو أظهره لفريق Blush", close:"إغلاق", order:"اطلب من Blush", date:"صالح حتى"}
+};
+let lang = "fr", rot = 0, busy = false;
+const $ = id => document.getElementById(id);
+const cv = $("wheel"), ctx = cv.getContext("2d");
+const N = PRIZES.length, S = 360 / N;
+
+function draw(){
+  const W = cv.width, R = W/2;
+  ctx.clearRect(0,0,W,W);
+  PRIZES.forEach((p,i)=>{
+    const pal = PAL[p.pal];
+    const a0 = (-90 + i*S) * Math.PI/180, a1 = (-90 + (i+1)*S) * Math.PI/180;
+    ctx.beginPath(); ctx.moveTo(R,R); ctx.arc(R,R,R,a0,a1); ctx.closePath();
+    ctx.fillStyle = p.strong ? pal.ac : pal.bg; ctx.fill();
+    ctx.lineWidth = 5; ctx.strokeStyle = "rgba(255,247,239,.85)"; ctx.stroke();
+    ctx.save(); ctx.translate(R,R); ctx.rotate((a0+a1)/2);
+    ctx.fillStyle = pal.fg; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    const lines = p[lang].split("\n"), fs = lang==="ar" ? 44 : 42, lh = fs*1.12;
+    ctx.font = lang==="ar" ? `800 ${fs}px Cairo,sans-serif` : `800 ${fs}px Fraunces,Georgia,serif`;
+    lines.forEach((ln,k)=> ctx.fillText(ln, R*0.64, (k-(lines.length-1)/2)*lh));
+    ctx.restore();
+  });
+}
+
+function pick(){
+  const tot = PRIZES.reduce((s,p)=>s+p.w,0); let r = Math.random()*tot;
+  for(let i=0;i<N;i++){ if((r-=PRIZES[i].w)<0) return i; } return N-1;
+}
+function promoChk(x){ x = PROMO_SALT + x; let a=17, b=29; for(const ch of x){ const v=ch.charCodeAt(0); a=(a*31+v)%1021; b=(b*37+v*7+a)%1021; } return PROMO_A[a%32]+PROMO_A[b%32]; }
+function makeCode(prefix){
+  const ex = Math.floor(Date.now()/864e5) - PROMO_E0 + VALID_DAYS;
+  let body = PROMO_A[(ex>>5)&31] + PROMO_A[ex&31];
+  for(let i=0;i<2;i++) body += PROMO_A[Math.floor(Math.random()*32)];
+  return prefix + "-" + body + promoChk(prefix + body);
+}
+function expiryOf(code){
+  const c = code.replace("-",""), ex = PROMO_A.indexOf(c[3])*32 + PROMO_A.indexOf(c[4]);
+  const d = new Date((PROMO_E0 + ex)*864e5);
+  return d.toLocaleDateString(lang==="ar"?"ar-TN":lang==="en"?"en-GB":"fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"UTC"});
+}
+function saved(){ try{ return JSON.parse(localStorage.getItem("blush_wheel2")||"null"); }catch(e){ return null; } }
+function save(o){ try{ localStorage.setItem("blush_wheel2", JSON.stringify(o)); }catch(e){} }
+
+function confetti(){
+  const cols=["#F06A96","#F7C23C","#8DB84F","#86B6E2","#FAC3D2"];
+  for(let i=0;i<70;i++){
+    const d=document.createElement("div"); d.className="conf";
+    d.style.left=Math.random()*100+"vw"; d.style.background=cols[i%cols.length];
+    d.style.animationDuration=(2+Math.random()*2)+"s"; d.style.animationDelay=Math.random()*.4+"s";
+    document.body.appendChild(d); setTimeout(()=>d.remove(),4800);
+  }
+}
+function setPalette(name){
+  const p = PAL[name]; if(!p) return;
+  const r = document.documentElement.style;
+  r.setProperty("--bg",p.bg); r.setProperty("--fg",p.fg); r.setProperty("--ac",p.ac);
+}
+
+function showResult(res){
+  const p = PRIZES[res.i], L = T[lang];
+  const label = p[lang].replace("\n"," ");
+  $("card").innerHTML = p.win
+    ? `<span class="pill">${L.pill}</span><h2>${L.win}</h2><div class="prize">${label}</div>
+       <div class="code">${res.code}</div>
+       <p>${L.showCode}<br>${L.date} ${expiryOf(res.code)}</p>
+       <a class="btn" href="${SITE_URL}/?promo=${res.code}#order" rel="noopener">${L.order}</a><br>
+       <button class="btn ghost2" id="x">${L.close}</button>`
+    : `<h2>${L.lose}</h2><p style="font-size:16px">${L.loseTxt}</p>
+       <button class="btn" id="x">${L.close}</button>`;
+  $("ov").classList.add("show");
+  $("x").onclick = ()=>$("ov").classList.remove("show");
+  if(p.win) confetti();
+}
+
+function spin(){
+  if(busy) return;
+  const prev = saved();
+  if(ONE_SPIN_PER_PHONE && prev){ setPalette(PRIZES[prev.i].pal); showResult(prev); return; }
+  busy = true; setUI();
+  const i = pick();
+  const jitter = (Math.random()-.5) * S * .7;
+  rot += 360*6 + (360 - rot%360) - (i+.5)*S + jitter;
+  cv.style.transform = `rotate(${rot}deg)`;
+  setTimeout(()=>{
+    const res = { i, code: PRIZES[i].win ? makeCode(PRIZES[i].code) : "" };
+    if(ONE_SPIN_PER_PHONE) save(res);
+    busy = false; setUI(); setPalette(PRIZES[i].pal); showResult(res);
+  }, 5400);
+}
+
+function setUI(){
+  const L = T[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang==="ar" ? "rtl" : "ltr";
+  $("t1").textContent = L.t1; $("t2").textContent = L.t2; $("note").textContent = L.note;
+  const done = ONE_SPIN_PER_PHONE && saved();
+  $("spin").textContent = busy ? L.spinning : (done ? L.again : L.go);
+  $("spin").disabled = busy;
+  ["en","fr","ar"].forEach(k=>$(k).setAttribute("aria-pressed", String(k===lang)));
+  draw();
+}
+["en","fr","ar"].forEach(k=> $(k).onclick = ()=>{ lang=k; setUI(); });
+$("spin").onclick = spin;
+$("ov").onclick = e=>{ if(e.target===$("ov")) $("ov").classList.remove("show"); };
+setUI();
+if(document.fonts){
+  Promise.all([document.fonts.load("800 42px Fraunces"), document.fonts.load("800 44px Cairo")])
+    .then(draw).catch(()=>{});
+  document.fonts.ready.then(draw);
+}
+</script>
+</body>
+</html>

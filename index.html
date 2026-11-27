@@ -145,6 +145,9 @@ form{display:grid;gap:14px}
 .geo-btn[hidden]{display:none}
 .geo-msg{font-size:13px;color:var(--muted);margin-top:6px}
 .geo-msg.bad{color:var(--err)}
+.promo-row{display:flex;gap:10px;align-items:stretch}
+.promo-row input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:1.5px}
+.promo-row .geo-btn{margin-top:0;flex:none;justify-content:center}
 
 .summary{margin-top:8px;background:var(--pop);color:var(--pop-ink);border-radius:22px;padding:18px 20px;display:grid;gap:6px}
 .summary .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
@@ -330,9 +333,16 @@ body{padding-bottom:0!important}
         <button type="button" class="geo-btn" id="geoBtn" data-i18n="geo_btn"></button>
         <p class="geo-msg" id="geoMsg" aria-live="polite"></p></div>
 
+      <div class="field promo">
+        <label for="fPromo" data-i18n="promo"></label>
+        <div class="promo-row"><input id="fPromo" name="promo" autocomplete="off" autocapitalize="characters" spellcheck="false" dir="ltr" data-ph="ph_promo"><button type="button" class="geo-btn" id="promoBtn" data-i18n="promo_apply"></button></div>
+        <p class="geo-msg" id="promoMsg" aria-live="polite"></p>
+      </div>
+
       <div class="summary" aria-live="polite">
         <div class="row"><span data-i18n="items"></span><b id="sumCans">0</b></div>
         <div class="row"><span data-i18n="subtotal"></span><b id="sumSub">0</b></div>
+        <div class="row" id="rowDisc" hidden><span data-i18n="discount"></span><b id="sumDisc">0</b></div>
         <div class="row"><span data-i18n="delivery"></span><b id="sumDel">0</b></div>
         <div class="row"><span data-i18n="total"></span><span class="big" id="sumTotal">0</span></div>
       </div>
@@ -416,7 +426,7 @@ const I18N = {
     surprise:'Surprise me',clear:'Clear',of:'of',
     last:'Last name',first:'First name',phone:'Phone number',address:'Address',ph_address:'Street, number, city',
     geo_btn:'📍 Use my location (optional)',geo_wait:'Locating…',geo_ok:'Location added ✅ Add a landmark (pharmacy, café…) if you can.',geo_denied:'Location access denied: type your address instead.',geo_fail:'Location unavailable: type your address instead.',
-    cans_total:'Cans',total:'Total',confirm:'Confirm my order',
+    cans_total:'Cans',total:'Total',confirm:'Confirm my order',promo:'Promo code',ph_promo:'Code from the Blush wheel',promo_apply:'Apply',promo_rm:'Remove',discount:'Discount',promo_pct:'-{p}% applied to your order.',promo_free:'Free delivery applied.',promo_gift_gummies:'Free gummies: we add them to your order.',promo_gift_candy:'Free Candy Pop: we add it to your order.',promo_gift_surprise:'Surprise gift: we add it to your order.',promo_bad:'Invalid code.',promo_exp:'This code has expired.',
     e_req:'This field is required.',e_phone:'Enter a valid phone number.',
     e_design:'Pick a design for your pack.',e_mix:'Your pack needs exactly {n} cans. {r} to go.',
     done_title:'Your order',done_lead:'Check your details, then send your order.',
@@ -442,7 +452,7 @@ const I18N = {
     surprise:'Surprends-moi',clear:'Effacer',of:'sur',
     last:'Nom',first:'Prénom',phone:'Numéro de téléphone',address:'Adresse',ph_address:'Rue, numéro, ville',
     geo_btn:'📍 Utiliser ma position (facultatif)',geo_wait:'Localisation en cours…',geo_ok:'Position ajoutée ✅ Ajoute un repère (pharmacie, café…) si tu peux.',geo_denied:'Accès à la position refusé : écris ton adresse à la main.',geo_fail:'Position indisponible : écris ton adresse à la main.',
-    cans_total:'Canettes',total:'Total',confirm:'Confirmer ma commande',
+    cans_total:'Canettes',total:'Total',confirm:'Confirmer ma commande',promo:'Code promo',ph_promo:'Code de la roue Blush',promo_apply:'Appliquer',promo_rm:'Retirer',discount:'Réduction',promo_pct:'-{p}% appliqué à ta commande.',promo_free:'Livraison offerte appliquée.',promo_gift_gummies:'Gummies offerts : on les ajoute à ta commande.',promo_gift_candy:'Candy Pop offert : on l’ajoute à ta commande.',promo_gift_surprise:'Cadeau surprise : on l’ajoute à ta commande.',promo_bad:'Code invalide.',promo_exp:'Ce code a expiré.',
     e_req:'Ce champ est obligatoire.',e_phone:'Entre un numéro de téléphone valide.',
     e_design:'Choisis un design pour ton pack.',e_mix:'Ton pack doit contenir exactement {n} canettes. Il en manque {r}.',
     done_title:'Ta commande',done_lead:'Vérifie tes informations, puis envoie ta commande.',
@@ -468,7 +478,7 @@ const I18N = {
     surprise:'فاجئني',clear:'مسح',of:'من',
     last:'اللقب',first:'الاسم',phone:'رقم الهاتف',address:'العنوان',ph_address:'الشارع، الرقم، المدينة',
     geo_btn:'📍 استخدم موقعي (اختياري)',geo_wait:'جارٍ تحديد الموقع…',geo_ok:'تمت إضافة موقعك ✅ أضف معلمًا قريبًا (صيدلية، مقهى…) إن أمكن.',geo_denied:'تم رفض الوصول إلى الموقع: اكتب عنوانك يدويًا.',geo_fail:'الموقع غير متاح: اكتب عنوانك يدويًا.',
-    cans_total:'العلب',total:'المجموع',confirm:'تأكيد طلبي',
+    cans_total:'العلب',total:'المجموع',confirm:'تأكيد طلبي',promo:'كود الخصم',ph_promo:'كود عجلة Blush',promo_apply:'تطبيق',promo_rm:'إزالة',discount:'الخصم',promo_pct:'تم تطبيق خصم {p}% على طلبك.',promo_free:'تم تطبيق التوصيل المجاني.',promo_gift_gummies:'غومي مجاني: سنضيفه إلى طلبك.',promo_gift_candy:'كاندي بوب مجاني: سنضيفه إلى طلبك.',promo_gift_surprise:'هدية مفاجأة: سنضيفها إلى طلبك.',promo_bad:'كود غير صالح.',promo_exp:'انتهت صلاحية هذا الكود.',
     e_req:'هذا الحقل مطلوب.',e_phone:'أدخل رقم هاتف صالحًا.',
     e_design:'اختر تصميمًا لباقتك.',e_mix:'يجب أن تحتوي باقتك على {n} علبة بالضبط. ينقصك {r}.',
     done_title:'طلبك',done_lead:'تحقق من معلوماتك ثم أرسل طلبك.',
@@ -772,7 +782,36 @@ const qty = {}; P.forEach(p=>{ qty[p.id]=0; });
 const avail = P.filter(p=>!p.soldout && !p.soon);
 const totalQty = () => avail.reduce((a,p)=>a+qty[p.id],0);
 const subPrice = () => avail.reduce((a,p)=>a+qty[p.id]*PRICES[p.id],0);
-const totalPrice = () => subPrice()+DELIVERY;
+/* ===== Code promo (roue Blush) : code = PRÉFIXE + expiration(2) + aléa(2) + contrôle(2) ===== */
+const PROMO_SALT='blush26', PROMO_A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', PROMO_E0=Date.UTC(2026,0,1)/864e5;
+const PROMO_TYPES={B10:{pct:10},B20:{pct:20},LIV:{free:1},GUM:{gift:'gummies'},CPO:{gift:'candy'},SUR:{gift:'surprise'}};
+function promoChk(s){ s=PROMO_SALT+s; let a=17,b=29; for(const ch of s){ const v=ch.charCodeAt(0); a=(a*31+v)%1021; b=(b*37+v*7+a)%1021; } return PROMO_A[a%32]+PROMO_A[b%32]; }
+function promoParse(raw){
+  const c=String(raw||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const ty=PROMO_TYPES[c.slice(0,3)];
+  if(c.length!==9||!ty||promoChk(c.slice(0,7))!==c.slice(7)) return {err:'promo_bad'};
+  const ex=PROMO_A.indexOf(c[3])*32+PROMO_A.indexOf(c[4]), today=Math.floor(Date.now()/864e5)-PROMO_E0;
+  if(today>ex) return {err:'promo_exp'};
+  return Object.assign({code:c.slice(0,3)+'-'+c.slice(3)},ty);
+}
+let promo=null, promoErr='';
+const discount = () => promo&&promo.pct ? Math.round(subPrice()*promo.pct)/100 : 0;
+const curDelivery = () => promo&&promo.free ? 0 : DELIVERY;
+const totalPrice = () => subPrice()-discount()+curDelivery();
+function renderPromo(){
+  const msg=$('#promoMsg'), btn=$('#promoBtn'), inp=$('#fPromo');
+  btn.textContent=t(promo?'promo_rm':'promo_apply'); inp.readOnly=!!promo;
+  let text='', bad=false;
+  if(promoErr){ text=t(promoErr); bad=true; }
+  else if(promo){ text=promo.pct?t('promo_pct').replace('{p}',promo.pct):promo.free?t('promo_free'):t('promo_gift_'+promo.gift); }
+  msg.textContent=text; msg.classList.toggle('bad',bad);
+  const d=discount(); $('#rowDisc').hidden=!(d>0); $('#sumDisc').textContent='−'+money(d);
+}
+function applyPromo(raw){
+  const r=promoParse(raw);
+  if(r.err){ promo=null; promoErr=r.err; } else { promo=r; promoErr=''; $('#fPromo').value=r.code; }
+  renderOrder();
+}
 function renderOrder(){
   $('#qrows').innerHTML=P.map(p=>{
     const img=`<img src="${p.thumb}" alt="">`;
@@ -783,7 +822,7 @@ function renderOrder(){
   }).join('');
   $('#minNote').textContent=t('min_note').replace('{n}',MIN_QTY).replace('{d}',money(DELIVERY));
   $('#sumCans').textContent=`${totalQty()} / ${MIN_QTY}`; $('#sumSub').textContent=money(subPrice());
-  $('#sumDel').textContent=money(DELIVERY); $('#sumTotal').textContent=money(totalPrice());
+  $('#sumDel').textContent=money(curDelivery()); $('#sumTotal').textContent=money(totalPrice()); renderPromo();
   $('#qerr').classList.remove('on');
   $('#orderBtn').textContent=t('order_now')+(totalQty()?` · ${totalQty()}/${MIN_QTY}`:'');
   $('#orderNow').textContent=t('order_now')+(totalQty()?` · ${totalQty()}/${MIN_QTY}`:'');
@@ -830,6 +869,13 @@ function updateReady(){
 ['fLast','fFirst','fPhone','fAddr'].forEach(id=>{ $('#'+id).addEventListener('input',updateReady); $('#'+id).addEventListener('change',updateReady); });
 const _render=renderOrder; renderOrder=function(){ _render.apply(this,arguments); updateReady(); };
 updateReady();
+$('#promoBtn').addEventListener('click',()=>{
+  if(promo){ promo=null; promoErr=''; $('#fPromo').value=''; renderOrder(); }
+  else if($('#fPromo').value.trim()) applyPromo($('#fPromo').value);
+});
+$('#fPromo').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#promoBtn').click(); } });
+/* lien de la roue : ?promo=CODE pré-remplit et applique le code */
+try{ const _pc=new URLSearchParams(location.search).get('promo'); if(_pc){ $('#fPromo').value=_pc; applyPromo(_pc); } }catch(e){}
 
 /* Bouton facultatif « Utiliser ma position » : ajoute un lien Google Maps à l'adresse */
 (function(){
@@ -856,7 +902,7 @@ function orderData(){
     name:`${$('#fFirst').value.trim()} ${$('#fLast').value.trim()}`,
     phone:$('#fPhone').value.trim(), address:$('#fAddr').value.trim(),
     lines:avail.filter(p=>qty[p.id]>0).map(p=>({id:p.id,q:qty[p.id],label:pname(p)})),
-    count:totalQty(), sub:subPrice(), delivery:DELIVERY, total:totalPrice()
+    count:totalQty(), sub:subPrice(), delivery:curDelivery(), total:totalPrice(), promo:promo?promo.code:'', discount:discount()
   };
 }
 let lastOrder=null, sent=false;
@@ -868,7 +914,7 @@ async function submitOrder(){
   btn.disabled=true; btn.textContent=t('sending'); err.classList.remove('on');
   try{
     const payload={date:new Date().toISOString(), lang, name:o.name, phone:o.phone, address:o.address,
-      ref:getRef(), items:o.lines.map(l=>`${l.q} x ${l.label}`).join(' | '), count:o.count, subtotal:o.sub, delivery:o.delivery, total:o.total};
+      ref:getRef(), items:o.lines.map(l=>`${l.q} x ${l.label}`).join(' | ')+(o.promo?` | CODE PROMO ${o.promo}${o.discount?` (-${o.discount} DT)`:''}`:''), promo:o.promo, discount:o.discount, count:o.count, subtotal:o.sub, delivery:o.delivery, total:o.total};
     await fetch(ORDER_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
     sent=true; showDone(false);
   }catch(e){
@@ -878,11 +924,11 @@ async function submitOrder(){
 function showDone(fresh=true){
   const o=(fresh||!lastOrder)?(lastOrder=orderData()):lastOrder, d=$('#done');
   o.lines.forEach(l=>{ l.label=pname(P.find(p=>p.id===l.id)); });
-  const text=`Blush\n${o.name}\n${o.phone}\n${o.address}\n\n`+o.lines.map(l=>`${l.q} x ${l.label}`).join('\n')+`\n\n${t('subtotal')}: ${money(o.sub)}\n${t('delivery')}: ${money(o.delivery)}\n${t('total')}: ${money(o.total)}`;
+  const text=`Blush\n${o.name}\n${o.phone}\n${o.address}\n\n`+o.lines.map(l=>`${l.q} x ${l.label}`).join('\n')+`\n\n${t('subtotal')}: ${money(o.sub)}\n`+(o.promo?`${t('promo')}: ${o.promo}`+(o.discount?` (−${money(o.discount)})`:'')+'\n':'')+`${t('delivery')}: ${money(o.delivery)}\n${t('total')}: ${money(o.total)}`;
   const wa = WHATSAPP ? `<a class="btn" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">${t('wa')}</a>` : '';
   d.innerHTML=`<div class="done"><h3>${t('done_title')}</h3><p>${t(sent?'sent_lead':'done_lead')}</p>
     <ul>${o.lines.map(l=>`<li><span>${l.label}</span><b>× ${l.q}</b></li>`).join('')}</ul>
-    <p>${t('subtotal')} : ${money(o.sub)}<br>${t('delivery')} : ${money(o.delivery)}<br><b>${t('total')} : ${money(o.total)}</b></p>
+    <p>${t('subtotal')} : ${money(o.sub)}<br>${o.promo?`${t('promo')} : ${o.promo}${o.discount?` (−${money(o.discount)})`:''}<br>`:''}${t('delivery')} : ${money(o.delivery)}<br><b>${t('total')} : ${money(o.total)}</b></p>
     <p class="who"></p>
     ${(WHATSAPP||ORDER_ENDPOINT)?'':`<p class="note">${t('preview')}</p>`}
     <div class="acts">${wa}<button type="button" class="btn ghost2" id="editOrder">${t('edit')}</button></div></div>`;
